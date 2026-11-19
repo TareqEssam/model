@@ -1,734 +1,1235 @@
-<!DOCTYPE html> <!-- تعريف نوع المستند بأنه HTML5 -->
-<html lang="ar" dir="rtl"> <!-- بداية صفحة HTML، اللغة عربية، والاتجاه من اليمين إلى اليسار -->
-<head> <!-- بداية رأس الصفحة (إعدادات ومعلومات غير مرئية) -->
-  <meta charset="UTF-8" /> <!-- تحديد ترميز الحروف UTF-8 لدعم العربية بشكل صحيح -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" /> <!-- ضبط العرض ليتناسب مع حجم شاشة الجهاز (متجاوب) -->
-  <title>مدرب ومختبر الصور: قطة أم أسد</title> <!-- عنوان الصفحة الظاهر في تبويب المتصفح -->
-  <style> <!-- بداية قسم التنسيقات CSS -->
-    :root { /* الجذر: تعريف متغيرات عامة تُستخدم في كل الصفحة */
-      --bg: #0f172a; /* متغير لون خلفية الصفحة (أزرق داكن) */
-      --card: #1e293b; /* متغير لون خلفية البطاقات (أفتح قليلاً) */
-      --card-2: #0b1120; /* متغير لون خلفية داخلية أغمق (مربعات وصناديق) */
-      --text: #f8fafc; /* متغير لون النص الأساسي (أبيض مائل) */
-      --muted: #94a3b8; /* متغير لون النص الثانوي الباهت (رمادي مزرق) */
-      --accent: #38bdf8; /* متغير اللون المميز (أزرق فاتح) */
-      --cat: #22c55e; /* متغير لون فئة القطة (أخضر) */
-      --lion: #f59e0b; /* متغير لون فئة الأسد (برتقالي/ذهبي) */
-      --test: #a855f7; /* متغير لون زر الاختبار (بنفسجي) */
-      --danger: #ef4444; /* متغير لون التحذير/الخطأ (أحمر) */
-      --border: #334155; /* متغير لون الحدود الفاصلة (رمادي مزرق) */
-    } /* نهاية تعريف المتغيرات */
-
-    * { /* تحديد خصائص تنطبق على جميع العناصر */
-      box-sizing: border-box; /* حساب الأبعاد شامل الحشو والحدود لتسهيل التخطيط */
-      font-family: "Segoe UI", Tahoma, Arial, sans-serif; /* تعيين نوع الخط مع بدائل احتياطية */
-    } /* نهاية القاعدة العامة */
-
-    body { /* تنسيق جسم الصفحة */
-      margin: 0; /* إزالة الهوامش الافتراضية للمتصفح */
-      background: var(--bg); /* تطبيق لون الخلفية من المتغير */
-      color: var(--text); /* تطبيق لون النص من المتغير */
-      padding: 20px; /* إضافة حشو داخلي حول المحتوى */
-      line-height: 1.6; /* تحسين تباعد الأسطر لسهولة القراءة */
-    } /* نهاية تنسيق الجسم */
-
-    .container { /* الحاوية الرئيسية لكل المحتوى */
-      max-width: 960px; /* تحديد أقصى عرض للحاوية */
-      margin: 0 auto; /* توسيط الحاوية أفقياً في الصفحة */
-      display: grid; /* استخدام نظام الشبكة للتخطيط */
-      gap: 18px; /* المسافة بين العناصر داخل الشبكة */
-    } /* نهاية تنسيق الحاوية */
-
-    header { /* تنسيق رأس الصفحة (العنوان والوصف) */
-      background: var(--card); /* لون خلفية البطاقة */
-      border: 1px solid var(--border); /* إطار رفيع بلون الحدود */
-      border-radius: 14px; /* تدوير الزوايا */
-      padding: 18px 22px; /* حشو داخلي رأسي وأفقي */
-    } /* نهاية تنسيق الرأس */
-
-    header h1 { /* تنسيق العنوان الرئيسي */
-      margin: 0 0 6px; /* إزالة الهامش العلوي وإضافة هامش سفلي صغير */
-      font-size: 1.4rem; /* حجم الخط */
-    } /* نهاية تنسيق العنوان */
-
-    header p { /* تنسيق الفقرة الوصفية في الرأس */
-      margin: 0; /* إزالة الهوامش */
-      color: var(--muted); /* لون نص باهت */
-      font-size: 0.95rem; /* حجم خط أصغر قليلاً */
-    } /* نهاية تنسيق الفقرة */
-
-    .grid-main { /* تنسيق الشبكة الرئيسية (عمودان) */
-      display: grid; /* تفعيل نظام الشبكة */
-      grid-template-columns: 1.2fr 1fr; /* عمودان: الأول أعرض قليلاً من الثاني */
-      gap: 18px; /* المسافة بين العمودين */
-    } /* نهاية تنسيق الشبكة */
-
-    @media (max-width: 780px) { /* قاعدة استجابة للشاشات الصغيرة (أقل من 780 بكسل) */
-      .grid-main { /* تعديل الشبكة الرئيسية على الموبايل */
-        grid-template-columns: 1fr; /* جعلها عموداً واحداً */
-      } /* نهاية التعديل */
-    } /* نهاية قاعدة الاستجابة */
-
-    .card { /* تنسيق البطاقات (كل قسم) */
-      background: var(--card); /* لون الخلفية */
-      border: 1px solid var(--border); /* إطار */
-      border-radius: 14px; /* زوايا مدورة */
-      padding: 18px; /* حشو داخلي */
-    } /* نهاية تنسيق البطاقة */
-
-    .card h2 { /* تنسيق عناوين البطاقات */
-      margin: 0 0 12px; /* هوامش العنوان */
-      font-size: 1.1rem; /* حجم الخط */
-      border-bottom: 1px solid var(--border); /* خط سفلي فاصل */
-      padding-bottom: 8px; /* حشو أسفل العنوان */
-    } /* نهاية تنسيق العنوان */
-
-    .camera-box { /* صندوق عرض الكاميرا/الصورة */
-      position: relative; /* لتكون مرجعاً للعناصر المطلقة داخله */
-      background: var(--card-2); /* خلفية غامقة */
-      border-radius: 12px; /* زوايا مدورة */
-      overflow: hidden; /* إخفاء أي محتوى يتجاوز الحدود */
-      border: 1px solid var(--border); /* إطار */
-      aspect-ratio: 4 / 3; /* تحديد نسبة العرض للارتفاع */
-      display: flex; /* تخطيط مرن لتوسيط المحتوى */
-      align-items: center; /* توسيط عمودي */
-      justify-content: center; /* توسيط أفقي */
-    } /* نهاية صندوق الكاميرا */
-
-    video, canvas.preview { /* تنسيق الفيديو والكانفاس المعروض */
-      width: 100%; /* ملء العرض */
-      height: 100%; /* ملء الارتفاع */
-      object-fit: cover; /* قص الصورة لتملأ الحاوية دون تشويه */
-      display: block; /* إزالة الفراغات السفلية الافتراضية */
-    } /* نهاية التنسيق */
-
-    .camera-placeholder { /* النص البديل قبل تشغيل الكاميرا */
-      color: var(--muted); /* لون باهت */
-      text-align: center; /* توسيط النص */
-      padding: 16px; /* حشو داخلي */
-    } /* نهاية التنسيق */
-
-    .cam-controls, .action-buttons { /* تنسيق صفوف الأزرار */
-      display: flex; /* ترتيب مرن */
-      flex-wrap: wrap; /* السماح بالانتقال لسطر جديد عند الضيق */
-      gap: 10px; /* المسافة بين الأزرار */
-      margin-top: 12px; /* هامش علوي */
-    } /* نهاية التنسيق */
-
-    button, .file-label { /* تنسيق الأزرار وتسمية رفع الملف */
-      border: none; /* إزالة الإطار الافتراضي */
-      border-radius: 10px; /* زوايا مدورة */
-      padding: 11px 16px; /* حشو داخلي */
-      font-size: 0.95rem; /* حجم الخط */
-      font-weight: 700; /* خط عريض */
-      cursor: pointer; /* شكل مؤشر اليد عند المرور */
-      color: #fff; /* لون النص أبيض */
-      transition: transform 0.12s ease, opacity 0.15s ease; /* حركة انتقال ناعمة */
-      display: inline-flex; /* تخطيط مرن داخلي */
-      align-items: center; /* توسيط عمودي */
-      justify-content: center; /* توسيط أفقي */
-      gap: 6px; /* مسافة بين الأيقونة والنص */
-    } /* نهاية تنسيق الأزرار */
-
-    button:hover, .file-label:hover { /* تأثير عند مرور الماوس */
-      opacity: 0.92; /* شفافية خفيفة */
-      transform: translateY(-1px); /* رفع الزر قليلاً للأعلى */
-    } /* نهاية تأثير المرور */
-
-    button:disabled { /* تنسيق الزر المعطل */
-      opacity: 0.45; /* شفافية أكبر ليبان غير مفعّل */
-      cursor: not-allowed; /* مؤشر منع */
-      transform: none; /* إلغاء تأثير الرفع */
-    } /* نهاية التنسيق */
-
-    .btn-cam { background: #0284c7; } /* لون زر تشغيل الكاميرا (أزرق) */
-    .btn-switch { background: #475569; } /* لون زر التبديل/الرفع (رمادي) */
-    .btn-reset { background: #7f1d1d; } /* لون زر التصفير (أحمر داكن) */
-    .btn-cat { background: var(--cat); color: #052e16; flex: 1; min-width: 120px; } /* زر القطة: أخضر، يتمدد، حد أدنى للعرض */
-    .btn-lion { background: var(--lion); color: #271500; flex: 1; min-width: 120px; } /* زر الأسد: برتقالي، يتمدد، حد أدنى للعرض */
-    .btn-test { background: var(--test); color: #fff; width: 100%; margin-top: 10px; padding: 13px; font-size: 1rem; } /* زر الاختبار: بنفسجي بعرض كامل */
-
-    input[type="file"] { /* تنسيق حقل رفع الملف */
-      display: none; /* إخفاؤه لأن التسمية (label) تقوم بدوره */
-    } /* نهاية التنسيق */
-
-    .stats { /* شبكة إحصائيات العدّ */
-      display: grid; /* تفعيل الشبكة */
-      grid-template-columns: repeat(2, 1fr); /* عمودان متساويان */
-      gap: 10px; /* مسافة بينهما */
-      margin-top: 12px; /* هامش علوي */
-    } /* نهاية التنسيق */
-
-    .stat-box { /* صندوق الإحصائية الواحدة */
-      background: var(--card-2); /* خلفية غامقة */
-      border: 1px solid var(--border); /* إطار */
-      border-radius: 10px; /* زوايا مدورة */
-      padding: 10px 12px; /* حشو داخلي */
-      text-align: center; /* توسيط المحتوى */
-    } /* نهاية التنسيق */
-
-    .stat-num { /* تنسيق الرقم في صندوق الإحصائية */
-      font-size: 1.4rem; /* حجم كبير للرقم */
-      font-weight: 800; /* خط عريض جداً */
-      display: block; /* يظهر في سطر مستقل */
-    } /* نهاية التنسيق */
-
-    .stat-label { /* تنسيق التسمية أسفل الرقم */
-      color: var(--muted); /* لون باهت */
-      font-size: 0.85rem; /* حجم صغير */
-    } /* نهاية التنسيق */
-
-    .result-box { /* صندوق عرض النتيجة */
-      margin-top: 14px; /* هامش علوي */
-      background: var(--card-2); /* خلفية غامقة */
-      border: 1px solid var(--border); /* إطار */
-      border-radius: 12px; /* زوايا مدورة */
-      padding: 14px; /* حشو داخلي */
-      min-height: 110px; /* أقل ارتفاع لتفادي التمدد المفاجئ */
-    } /* نهاية التنسيق */
-
-    .prediction-title { /* عنوان التخمين/النتيجة */
-      font-size: 1.25rem; /* حجم خط كبير */
-      font-weight: 800; /* عريض جداً */
-      margin-bottom: 6px; /* هامش سفلي */
-    } /* نهاية التنسيق */
-
-    .meter-wrap { /* حاوية شريط القياس */
-      background: #1e293b; /* خلفية الشريط */
-      border-radius: 999px; /* زوايا دائرية كاملة */
-      height: 12px; /* ارتفاع الشريط */
-      overflow: hidden; /* إخفاء التجاوز */
-      margin: 8px 0; /* هوامش رأسية */
-    } /* نهاية التنسيق */
-
-    .meter-bar { /* الجزء الملوّن من شريط القياس */
-      height: 100%; /* يمتد بكامل الارتفاع */
-      width: 0%; /* يبدأ فارغاً ويتغير عبر JS */
-      background: var(--accent); /* اللون الافتراضي */
-      transition: width 0.25s ease; /* حركة نمو ناعمة */
-    } /* نهاية التنسيق */
-
-    .setting-item { /* كل عنصر إعداد */
-      margin-bottom: 16px; /* هامش سفلي */
-      background: var(--card-2); /* خلفية غامقة */
-      padding: 12px; /* حشو داخلي */
-      border-radius: 10px; /* زوايا مدورة */
-      border: 1px solid var(--border); /* إطار */
-    } /* نهاية التنسيق */
-
-    .setting-header { /* رأس عنصر الإعداد (الاسم والقيمة) */
-      display: flex; /* ترتيب مرن */
-      justify-content: space-between; /* توزيع العنصرين على الطرفين */
-      font-weight: 700; /* خط عريض */
-      margin-bottom: 6px; /* هامش سفلي */
-      font-size: 0.92rem; /* حجم خط */
-    } /* نهاية التنسيق */
-
-    .setting-desc { /* الوصف التوضيحي تحت الإعداد */
-      font-size: 0.82rem; /* حجم صغير */
-      color: var(--muted); /* لون باهت */
-      margin-top: 6px; /* هامش علوي */
-    } /* نهاية التنسيق */
-
-    input[type="range"], select { /* تنسيق شريط التمرير والقوائم المنسدلة */
-      width: 100%; /* عرض كامل */
-      accent-color: var(--accent); /* لون التمييز */
-    } /* نهاية التنسيق */
-
-    select { /* تنسيق القائمة المنسدلة */
-      background: var(--card); /* خلفية */
-      color: var(--text); /* لون النص */
-      border: 1px solid var(--border); /* إطار */
-      border-radius: 8px; /* زوايا مدورة */
-      padding: 8px 10px; /* حشو داخلي */
-      font-size: 0.92rem; /* حجم خط */
-    } /* نهاية التنسيق */
-
-    .log { /* صندوق السجل */
-      font-size: 0.85rem; /* حجم خط صغير */
-      color: var(--muted); /* لون باهت */
-      margin-top: 10px; /* هامش علوي */
-      max-height: 110px; /* أقصى ارتفاع مع التمرير */
-      overflow-y: auto; /* إظهار شريط تمرير رأسي عند الحاجة */
-      background: var(--card-2); /* خلفية غامقة */
-      padding: 10px; /* حشو داخلي */
-      border-radius: 10px; /* زوايا مدورة */
-      border: 1px solid var(--border); /* إطار */
-    } /* نهاية التنسيق */
-  </style> <!-- نهاية قسم CSS -->
-</head> <!-- نهاية رأس الصفحة -->
-<body> <!-- بداية جسم الصفحة المرئي -->
-  <div class="container"> <!-- الحاوية الرئيسية -->
-    <header> <!-- رأس الصفحة -->
-      <h1>🐱🦁 تدريب واختبار نموذج محلي: قطة أم أسد</h1> <!-- العنوان الرئيسي -->
-      <p>افتح الكاميرا، التقط صوراً واضغط على <strong>قطة</strong> أو <strong>أسد</strong> لتعليم النموذج، ثم استخدم زر <strong>اختبار</strong> للتخمين وتحكم في الدقة من الإعدادات.</p> <!-- شرح مختصر للاستخدام -->
-    </header> <!-- نهاية الرأس -->
-
-    <div class="grid-main"> <!-- الشبكة الرئيسية (عمودان) -->
-      <!-- الكاميرا وأزرار التعليم والاختبار -->
-      <div class="card"> <!-- البطاقة الأولى -->
-        <h2>1. الكاميرا والتدريب والاختبار</h2> <!-- عنوان البطاقة -->
-
-        <div class="camera-box"> <!-- صندوق عرض الكاميرا -->
-          <video id="video" autoplay playsinline muted style="display:none;"></video> <!-- عنصر الفيديو: تشغيل تلقائي، بدون ملء الشاشة على iOS، صامت، مخفي مبدئياً -->
-          <canvas id="snapshotCanvas" class="preview" style="display:none;"></canvas> <!-- كانفاس لعرض الصورة الملتقطة أو المرفوعة، مخفي مبدئياً -->
-          <div id="placeholder" class="camera-placeholder"> <!-- النص البديل قبل التشغيل -->
-            اضغط على <strong>تشغيل الكاميرا</strong> للبدء، أو ارفع صورة مباشرة للتجربة. <!-- إرشاد المستخدم -->
-          </div> <!-- نهاية النص البديل -->
-        </div> <!-- نهاية صندوق الكاميرا -->
-
-        <div class="cam-controls"> <!-- صف أزرار التحكم بالكاميرا -->
-          <button id="startCamBtn" class="btn-cam">📷 تشغيل الكاميرا</button> <!-- زر تشغيل الكاميرا -->
-          <button id="switchCamBtn" class="btn-switch" disabled>🔄 تبديل الكاميرا</button> <!-- زر تبديل الكاميرا (معطل حتى التشغيل) -->
-          <label class="file-label btn-switch"> <!-- تسمية تعمل كزر لرفع صورة -->
-            🖼️ رفع صورة <!-- نص الزر -->
-            <input type="file" id="imageUpload" accept="image/*" /> <!-- حقل ملف مخفي يقبل الصور فقط -->
-          </label> <!-- نهاية التسمية -->
-          <button id="resetBtn" class="btn-reset">🗑️ تصفير النموذج</button> <!-- زر مسح بيانات التدريب -->
-        </div> <!-- نهاية صف التحكم -->
-
-        <div class="action-buttons"> <!-- صف أزرار التعليم -->
-          <button id="trainCatBtn" class="btn-cat">🐱 قطه (تعليم)</button> <!-- زر تعليم الصورة الحالية كقطة -->
-          <button id="trainLionBtn" class="btn-lion">🦁 اسد (تعليم)</button> <!-- زر تعليم الصورة الحالية كأسد -->
-        </div> <!-- نهاية صف التعليم -->
-
-        <button id="testBtn" class="btn-test">🔍 اختبار (تخمين قطة أم أسد)</button> <!-- زر تنفيذ الاختبار/التخمين -->
-
-        <div class="stats"> <!-- شبكة الإحصائيات -->
-          <div class="stat-box"> <!-- صندوق عدّ القطط -->
-            <span id="catCount" class="stat-num" style="color: var(--cat);">0</span> <!-- رقم عدد صور القطط -->
-            <span class="stat-label">صور تدريب: قطة</span> <!-- تسمية الصندوق -->
-          </div> <!-- نهاية صندوق القطط -->
-          <div class="stat-box"> <!-- صندوق عدّ الأسود -->
-            <span id="lionCount" class="stat-num" style="color: var(--lion);">0</span> <!-- رقم عدد صور الأسود -->
-            <span class="stat-label">صور تدريب: أسد</span> <!-- تسمية الصندوق -->
-          </div> <!-- نهاية صندوق الأسود -->
-        </div> <!-- نهاية الإحصائيات -->
-
-        <div id="resultBox" class="result-box"> <!-- صندوق عرض النتيجة -->
-          <div class="prediction-title">بانتظار التدريب والاختبار...</div> <!-- نص مبدئي -->
-          <div style="color: var(--muted); font-size: 0.9rem;"> <!-- شرح الإرشادات -->
-            التقت عدة صور للقطة واضغط «قطه»، ثم التقط عدة صور للأسد واضغط «أسد»، ثم اضغط «اختبار». <!-- خطوات الاستخدام -->
-          </div> <!-- نهاية الشرح -->
-        </div> <!-- نهاية صندوق النتيجة -->
-
-        <div id="logBox" class="log">سجل العمليات جاهز.</div> <!-- صندوق سجل العمليات -->
-      </div> <!-- نهاية البطاقة الأولى -->
-
-      <!-- إعدادات الدقة -->
-      <div class="card"> <!-- البطاقة الثانية (الإعدادات) -->
-        <h2>2. إعدادات زيادة أو تخفيض الدقة</h2> <!-- عنوان البطاقة -->
-
-        <div class="setting-item"> <!-- إعداد دقة الشبكة -->
-          <div class="setting-header"> <!-- رأس الإعداد -->
-            <span>دقة تفاصيل الصورة (شبكة الميزات)</span> <!-- اسم الإعداد -->
-            <span id="gridLabel">16×16 (متوسطة)</span> <!-- القيمة الحالية -->
-          </div> <!-- نهاية الرأس -->
-          <select id="gridSizeSelect"> <!-- قائمة اختيار حجم الشبكة -->
-            <option value="8">8×8 — سرعة عالية / دقة تفاصيل منخفضة</option> <!-- خيار 8×8 -->
-            <option value="16" selected>16×16 — توازن جيد بين السرعة والدقة</option> <!-- خيار 16×16 (المحدد افتراضياً) -->
-            <option value="24">24×24 — دقة تفاصيل أعلى / معالجة أبطأ قليلاً</option> <!-- خيار 24×24 -->
-          </select> <!-- نهاية القائمة -->
-          <div class="setting-desc"> <!-- شرح الإعداد -->
-            زيادة حجم الشبكة تقسّم الصورة إلى خلايا أدق لاستخراج تفاصيل أكثر، بينما تقليلها يسرّع الأداء ويقلل الحساسية للتفاصيل الصغيرة. <!-- توضيح -->
-          </div> <!-- نهاية الشرح -->
-        </div> <!-- نهاية إعداد الشبكة -->
-
-        <div class="setting-item"> <!-- إعداد عدد الجولات -->
-          <div class="setting-header"> <!-- رأس الإعداد -->
-            <span>عدد جولات التدريب لكل لقطة (Epochs)</span> <!-- اسم الإعداد -->
-            <span id="epochsVal">12</span> <!-- القيمة الحالية -->
-          </div> <!-- نهاية الرأس -->
-          <input type="range" id="epochsRange" min="1" max="30" value="12" /> <!-- شريط تمرير من 1 إلى 30 بقيمة ابتدائية 12 -->
-          <div class="setting-desc"> <!-- شرح الإعداد -->
-            زيادة الجولات تعمّق تعديل الأوزان على كل صورة تُلتقط؛ تخفيضها يجعل التعلم أخف وأسرع. <!-- توضيح -->
-          </div> <!-- نهاية الشرح -->
-        </div> <!-- نهاية إعداد الجولات -->
-
-        <div class="setting-item"> <!-- إعداد حد الثقة -->
-          <div class="setting-header"> <!-- رأس الإعداد -->
-            <span>حد الثقة المطلوب للقرار (Confidence Threshold)</span> <!-- اسم الإعداد -->
-            <span id="thresholdVal">60%</span> <!-- القيمة الحالية -->
-          </div> <!-- نهاية الرأس -->
-          <input type="range" id="thresholdRange" min="50" max="90" value="60" /> <!-- شريط تمرير من 50 إلى 90 بقيمة ابتدائية 60 -->
-          <div class="setting-desc"> <!-- شرح الإعداد -->
-            رفع الحد يجعل النموذج أكثر تحفظاً ويطلب تطابقاً أعلى قبل الجزم بالنتيجة؛ خفضه يجعله يقدّم تخميناً حتى عند التقارب. <!-- توضيح -->
-          </div> <!-- نهاية الشرح -->
-        </div> <!-- نهاية إعداد حد الثقة -->
-
-        <div class="setting-item" style="margin-bottom: 0;"> <!-- إعداد نصائح (بدون هامش سفلي) -->
-          <div class="setting-header"> <!-- رأس الإعداد -->
-            <span>ملاحظات عملية لرفع دقة التعرف</span> <!-- عنوان النصائح -->
-          </div> <!-- نهاية الرأس -->
-          <div class="setting-desc" style="margin-top: 0;"> <!-- محتوى النصائح -->
-            • درّب النموذج على <strong>5 إلى 15 صورة</strong> لكل فئة بزوايا وإضاءة مختلفة.<br/> <!-- نصيحة أولى -->
-            • ثبّت الخلفية قدر الإمكان أثناء التدريب والاختبار حتى لا يعتمد النموذج على لون الخلفية بدلاً من الكائن.<br/> <!-- نصيحة ثانية -->
-            • إذا غيّرت <strong>دقة تفاصيل الصورة</strong> بعد التدريب، يُفضّل إعادة التدريب بالشبكة الجديدة لتتطابق أبعاد المتجهات. <!-- نصيحة ثالثة -->
-          </div> <!-- نهاية النصائح -->
-        </div> <!-- نهاية إعداد النصائح -->
-      </div> <!-- نهاية البطاقة الثانية -->
-    </div> <!-- نهاية الشبكة الرئيسية -->
-  </div> <!-- نهاية الحاوية -->
-
-  <!-- كانفاس داخلي لاستخراج الميزات -->
-  <canvas id="featureCanvas" style="display:none;"></canvas> <!-- كانفاس مخفي يُستخدم لتصغير الصورة واستخراج الميزات -->
-
-  <script> <!-- بداية كود جافاسكريبت -->
-    const video = document.getElementById("video"); // جلب عنصر الفيديو من الصفحة
-    const snapshotCanvas = document.getElementById("snapshotCanvas"); // جلب كانفاس اللقطة المعروضة
-    const featureCanvas = document.getElementById("featureCanvas"); // جلب الكانفاس المخفي لاستخراج الميزات
-    const placeholder = document.getElementById("placeholder"); // جلب عنصر النص البديل
-
-    const startCamBtn = document.getElementById("startCamBtn"); // جلب زر تشغيل الكاميرا
-    const switchCamBtn = document.getElementById("switchCamBtn"); // جلب زر تبديل الكاميرا
-    const imageUpload = document.getElementById("imageUpload"); // جلب حقل رفع الصورة
-    const resetBtn = document.getElementById("resetBtn"); // جلب زر التصفير
-    const trainCatBtn = document.getElementById("trainCatBtn"); // جلب زر تعليم "قطة"
-    const trainLionBtn = document.getElementById("trainLionBtn"); // جلب زر تعليم "أسد"
-    const testBtn = document.getElementById("testBtn"); // جلب زر الاختبار
-
-    const catCountEl = document.getElementById("catCount"); // جلب عنصر عرض عدد صور القطط
-    const lionCountEl = document.getElementById("lionCount"); // جلب عنصر عرض عدد صور الأسود
-    const resultBox = document.getElementById("resultBox"); // جلب صندوق النتيجة
-    const logBox = document.getElementById("logBox"); // جلب صندوق السجل
-
-    const gridSizeSelect = document.getElementById("gridSizeSelect"); // جلب قائمة حجم الشبكة
-    const gridLabel = document.getElementById("gridLabel"); // جلب نص قيمة حجم الشبكة
-    const epochsRange = document.getElementById("epochsRange"); // جلب شريط عدد الجولات
-    const epochsVal = document.getElementById("epochsVal"); // جلب نص قيمة عدد الجولات
-    const thresholdRange = document.getElementById("thresholdRange"); // جلب شريط حد الثقة
-    const thresholdVal = document.getElementById("thresholdVal"); // جلب نص قيمة حد الثقة
-
-    let stream = null; // متغير لحفظ بث الكاميرا الحالي (null يعني لا يوجد)
-    let facingMode = "environment"; // اتجاه الكاميرا: الخلفية افتراضياً
-    let hasUploadedSource = false; // هل المصدر الحالي صورة مرفوعة بدل الكاميرا؟
-
-    // بيانات التدريب وأوزان النموذج الخطي البسيط (1 = أسد ، 0 = قطة)
-    let samples = []; // مصفوفة تخزين كل عينات التدريب {التسمية، المتجه، حجم الشبكة}
-    let weights = null; // متجه الأوزان الخاص بالنموذج (يُنشأ عند الحاجة)
-    let bias = 0; // قيمة الانحياز (الحد الثابت) في النموذج الخطي
-
-    function log(msg) { // دالة إضافة رسالة إلى سجل العمليات
-      const time = new Date().toLocaleTimeString("ar-EG"); // الحصول على الوقت الحالي بصيغة عربية
-      logBox.innerHTML = `<div>[${time}] ${msg}</div>` + logBox.innerHTML; // إضافة الرسالة الجديدة أعلى السجل
-    } // نهاية دالة السجل
-
-    function updateStats() { // دالة تحديث أعداد صور التدريب المعروضة
-      const catSamples = samples.filter(s => s.label === "cat").length; // عدّ العينات المصنفة كقطة
-      const lionSamples = samples.filter(s => s.label === "lion").length; // عدّ العينات المصنفة كأسد
-      catCountEl.textContent = catSamples; // عرض عدد صور القطط
-      lionCountEl.textContent = lionSamples; // عرض عدد صور الأسود
-    } // نهاية دالة التحديث
-
-    // تحديث تسميات الإعدادات
-    gridSizeSelect.addEventListener("change", () => { // عند تغيير حجم الشبكة من القائمة
-      const g = Number(gridSizeSelect.value); // تحويل القيمة المختارة إلى رقم
-      const textMap = { // قاموس نصوص لكل حجم
-        8: "8×8 (منخفضة)", // وصف الحجم الصغير
-        16: "16×16 (متوسطة)", // وصف الحجم المتوسط
-        24: "24×24 (عالية)" // وصف الحجم الكبير
-      }; // نهاية القاموس
-      gridLabel.textContent = textMap[g] || `${g}×${g}`; // تحديث النص المعروض (أو صيغة بديلة)
-      weights = null; // إبطال الأوزان لأن أبعاد المتجه ستتغير
-      bias = 0; // تصفير الانحياز
-      log(`تم تغيير دقة الشبكة إلى ${g}×${g} (أعد التدريب لضمان توافق الأبعاد).`); // تسجيل التنبيه في السجل
-    }); // نهاية مستمع تغيير الشبكة
-
-    epochsRange.addEventListener("input", () => { // عند تحريك شريط عدد الجولات
-      epochsVal.textContent = epochsRange.value; // تحديث الرقم المعروض ليطابق الشريط
-    }); // نهاية المستمع
-
-    thresholdRange.addEventListener("input", () => { // عند تحريك شريط حد الثقة
-      thresholdVal.textContent = `${thresholdRange.value}%`; // تحديث النص بإضافة علامة النسبة
-    }); // نهاية المستمع
-
-    // تشغيل الكاميرا
-    async function startCamera() { // دالة غير متزامنة لتشغيل الكاميرا
-      try { // محاولة التنفيذ مع معالجة الأخطاء
-        if (stream) { // إذا كان هناك بث قديم يعمل
-          stream.getTracks().forEach(t => t.stop()); // إيقاف كل مسارات البث القديم
-        } // نهاية الشرط
-        stream = await navigator.mediaDevices.getUserMedia({ // طلب الوصول إلى الكاميرا وانتظار الموافقة
-          video: { facingMode }, // تحديد الكاميرا الأمامية أو الخلفية حسب المتغير
-          audio: false // بدون صوت
-        }); // نهاية الطلب
-        video.srcObject = stream; // ربط بث الكاميرا بعنصر الفيديو
-        hasUploadedSource = false; // إلغاء وضع الصورة المرفوعة
-        snapshotCanvas.style.display = "none"; // إخفاء الكانفاس المعروض
-        video.style.display = "block"; // إظهار الفيديو
-        placeholder.style.display = "none"; // إخفاء النص البديل
-        switchCamBtn.disabled = false; // تفعيل زر تبديل الكاميرا
-        log("تم تشغيل الكاميرا بنجاح."); // تسجيل نجاح التشغيل
-      } catch (err) { // في حال فشل الوصول للكاميرا
-        log(`تعذر فتح الكاميرا (${err.message}). يمكنك استخدام زر "رفع صورة" للتجربة.`); // تسجيل الخطأ في السجل
-        alert("تعذر الوصول إلى الكاميرا. تأكد من السماح بالصلاحية أو استخدم زر «رفع صورة»."); // تنبيه للمستخدم
-      } // نهاية معالجة الخطأ
-    } // نهاية دالة تشغيل الكاميرا
-
-    startCamBtn.addEventListener("click", startCamera); // ربط زر التشغيل بالدالة
-
-    switchCamBtn.addEventListener("click", () => { // عند الضغط على زر التبديل
-      facingMode = facingMode === "environment" ? "user" : "environment"; // عكس اتجاه الكاميرا بين الخلفية والأمامية
-      startCamera(); // إعادة تشغيل الكاميرا بالاتجاه الجديد
-    }); // نهاية المستمع
-
-    // رفع صورة من الجهاز كبديل أو إضافي للكاميرا
-    imageUpload.addEventListener("change", (e) => { // عند اختيار ملف صورة
-      const file = e.target.files[0]; // جلب أول ملف مختار
-      if (!file) return; // إذا لم يُختَر ملف، اخرج من الدالة
-      const reader = new FileReader(); // إنشاء قارئ ملفات لتحويل الصورة إلى نص
-      reader.onload = (ev) => { // عند انتهاء قراءة الملف
-        const img = new Image(); // إنشاء عنصر صورة جديد في الذاكرة
-        img.onload = () => { // عند اكتمال تحميل الصورة
-          snapshotCanvas.width = img.width; // ضبط عرض الكانفاس كعرض الصورة
-          snapshotCanvas.height = img.height; // ضبط ارتفاع الكانفاس كارتفاع الصورة
-          const ctx = snapshotCanvas.getContext("2d"); // الحصول على سياق الرسم ثنائي الأبعاد
-          ctx.drawImage(img, 0, 0); // رسم الصورة على الكانفاس من الزاوية العليا اليسرى
-          video.style.display = "none"; // إخفاء الفيديو
-          placeholder.style.display = "none"; // إخفاء النص البديل
-          snapshotCanvas.style.display = "block"; // إظهار الصورة المرفوعة
-          hasUploadedSource = true; // تعيين المصدر الحالي كصورة مرفوعة
-          log(`تم تحميل الصورة: ${file.name}`); // تسجيل اسم الصورة المحمّلة
-        }; // نهاية معالج تحميل الصورة
-        img.src = ev.target.result; // تعيين مصدر الصورة إلى البيانات المقروءة
-      }; // نهاية معالج القراءة
-      reader.readAsDataURL(file); // بدء قراءة الملف كـ Data URL
-    }); // نهاية مستمع رفع الصورة
-
-    // التقاط الإطار الحالي في snapshotCanvas وإرجاع مصدر الرسم
-    function captureCurrentFrame() { // دالة إرجاع المصدر المرئي الحالي (كانفاس)
-      if (hasUploadedSource && snapshotCanvas.width > 0) { // إذا كان المصدر صورة مرفوعة جاهزة
-        return snapshotCanvas; // أرجِع الكانفاس مباشرة
-      } // نهاية الشرط
-      if (video.srcObject && video.readyState >= 2) { // إذا كان الفيديو يعمل والبيانات جاهزة للرسم
-        const w = video.videoWidth || 640; // عرض الفيديو (أو قيمة افتراضية)
-        const h = video.videoHeight || 480; // ارتفاع الفيديو (أو قيمة افتراضية)
-        snapshotCanvas.width = w; // ضبط عرض الكانفاس
-        snapshotCanvas.height = h; // ضبط ارتفاع الكانفاس
-        const ctx = snapshotCanvas.getContext("2d"); // الحصول على سياق الرسم
-        ctx.drawImage(video, 0, 0, w, h); // رسم الإطار الحالي من الفيديو على الكانفاس
-        return snapshotCanvas; // أرجِع الكانفاس الذي يحتوي الإطار
-      } // نهاية الشرط
-      return null; // لا يوجد مصدر متاح
-    } // نهاية دالة الالتقاط
-
-    // استخراج متجه ميزات بصرية (ألوان + سطوع + تدرجات حواف)
-    function extractFeatures(sourceCanvas, gridSize) { // دالة تحويل الصورة إلى مصفوفة أرقام
-      featureCanvas.width = gridSize; // ضبط عرض كانفاس الميزات لحجم الشبكة
-      featureCanvas.height = gridSize; // ضبط ارتفاعه لحجم الشبكة
-      const ctx = featureCanvas.getContext("2d"); // الحصول على سياق الرسم
-      ctx.drawImage(sourceCanvas, 0, 0, gridSize, gridSize); // تصغير/تكبير الصورة لملء الشبكة
-      const data = ctx.getImageData(0, 0, gridSize, gridSize).data; // قراءة بيانات البكسل (RGBA)
-
-      const lum = new Float32Array(gridSize * gridSize); // مصفوفة لتخزين قيم السطوع لكل خلية
-      const raw = []; // مصفوفة تجميع كل الميزات الخام
-
-      for (let i = 0; i < gridSize * gridSize; i++) { // المرور على كل خلية في الشبكة
-        const r = data[i * 4] / 255; // قراءة القناة الحمراء وتطبيعها بين 0 و1
-        const g = data[i * 4 + 1] / 255; // قراءة القناة الخضراء وتطبيعها
-        const b = data[i * 4 + 2] / 255; // قراءة القناة الزرقاء وتطبيعها
-        lum[i] = 0.299 * r + 0.587 * g + 0.114 * b; // حساب السطوع (Luminance) بمعاملات معيارية
-        raw.push(r, g, b); // إضافة قنوات اللون إلى الميزات
-      } // نهاية حلقة الألوان
-
-      // إضافة فروق السطوع الأفقية والرأسية (تمثل الحواف والملمس)
-      for (let y = 0; y < gridSize; y++) { // المرور على الصفوف
-        for (let x = 0; x < gridSize; x++) { // المرور على الأعمدة
-          const idx = y * gridSize + x; // حساب فهرس الخلية الحالية
-          const dx = x < gridSize - 1 ? lum[idx + 1] - lum[idx] : 0; // فرق السطوع مع الخلية اليمنى (أفقي)
-          const dy = y < gridSize - 1 ? lum[idx + gridSize] - lum[idx] : 0; // فرق السطوع مع الخلية السفلية (رأسي)
-          raw.push(dx + 0.5, dy + 0.5); // إضافة الفرقين مع إزاحة لتفادي السالب
-        } // نهاية حلقة الأعمدة
-      } // نهاية حلقة الصفوف
-
-      // تطبيع L2
-      let normSq = 0; // متغير لمجموع مربعات القيم
-      for (let i = 0; i < raw.length; i++) normSq += raw[i] * raw[i]; // جمع مربعات كل الميزات
-      const norm = Math.sqrt(normSq) || 1; // الجذر التربيعي (أو 1 لتفادي القسمة على صفر)
-      const vec = new Float32Array(raw.length); // إنشاء متجه نهائي بنفس طول الميزات
-      for (let i = 0; i < raw.length; i++) vec[i] = raw[i] / norm; // قسمة كل قيمة على الطول لتطبيع المتجه
-      return vec; // إرجاع المتجه المطبع
-    } // نهاية دالة استخراج الميزات
-
-    function sigmoid(z) { // دالة Sigmoid لتحويل أي رقم إلى احتمال بين 0 و1
-      if (z >= 0) { // إذا كان الرقم موجباً أو صفراً
-        const ez = Math.exp(-z); // حساب الأس السالب
-        return 1 / (1 + ez); // الصيغة المستقرة رقمياً
-      } else { // إذا كان الرقم سالباً
-        const ez = Math.exp(z); // حساب الأس الموجب
-        return ez / (1 + ez); // صيغة مكافئة مستقرة رقمياً
-      } // نهاية الشرط
-    } // نهاية دالة Sigmoid
-
-    function ensureWeights(dim) { // دالة التأكد من وجود أوزان بالبعد الصحيح
-      if (!weights || weights.length !== dim) { // إذا لم توجد أوزان أو كان طولها مختلفاً
-        weights = new Float32Array(dim); // إنشاء متجه أوزان جديد أصفار
-        bias = 0; // تصفير الانحياز
-      } // نهاية الشرط
-    } // نهاية الدالة
-
-    // تدريب النموذج على العينة الجديدة بعدد جولات محدد
-    function trainOnSample(label) { // دالة تعليم الصورة الحالية بفئة معينة
-      const frame = captureCurrentFrame(); // الحصول على الإطار/الصورة الحالية
-      if (!frame) { // إذا لم يوجد مصدر
-        alert("يرجى تشغيل الكاميرا أولاً أو رفع صورة."); // تنبيه المستخدم
-        return; // اخرج من الدالة
-      } // نهاية الشرط
-
-      const gridSize = Number(gridSizeSelect.value); // قراءة حجم الشبكة المختار
-      const epochs = Number(epochsRange.value); // قراءة عدد الجولات المختار
-      const vec = extractFeatures(frame, gridSize); // استخراج متجه الميزات من الصورة
-      ensureWeights(vec.length); // التأكد من مطابقة طول الأوزان لطول المتجه
-
-      samples.push({ label, vec, gridSize }); // إضافة العينة الجديدة إلى قائمة العينات
-      updateStats(); // تحديث عدادات الصور المعروضة
-
-      const target = label === "lion" ? 1 : 0; // القيمة المستهدفة: 1 للأسد و0 للقطة
-      const lr = 0.35; // معدل التعلم (سرعة تعديل الأوزان)
-
-      // تدريب متعدد الجولات على العينة الحالية ومزيج من العينات السابقة لتثبيت التعلم
-      for (let ep = 0; ep < epochs; ep++) { // حلقة تكرار بعدد الجولات
-        let z = bias; // بداية الحساب بالانحياز
-        for (let i = 0; i < vec.length; i++) z += weights[i] * vec[i]; // حاصل الضرب النقطي بين الأوزان والمتجه
-        const pred = sigmoid(z); // تحويل الناتج إلى احتمال
-        const err = target - pred; // حساب الخطأ (الفرق بين الهدف والتوقع)
-        for (let i = 0; i < vec.length; i++) { // حلقة تعديل الأوزان
-          weights[i] += lr * err * vec[i]; // تحديث كل وزن باتجاه تقليل الخطأ
-        } // نهاية حلقة الأوزان
-        bias += lr * err; // تحديث الانحياز بنفس المنطق
-
-        // تحديث خفيف على عينة سابقة عشوائية إن وجدت لتقليل النسيان
-        if (samples.length > 1) { // إذا كانت هناك عينات سابقة
-          const prev = samples[Math.floor(Math.random() * samples.length)]; // اختيار عينة عشوائية
-          if (prev.vec.length === weights.length) { // التأكد من تطابق الأبعاد
-            const prevTarget = prev.label === "lion" ? 1 : 0; // الهدف الخاص بالعينة السابقة
-            let pz = bias; // بداية الحساب بالانحياز
-            for (let i = 0; i < prev.vec.length; i++) pz += weights[i] * prev.vec[i]; // الضرب النقطي مع العينة السابقة
-            const pPred = sigmoid(pz); // احتمال العينة السابقة
-            const pErr = prevTarget - pPred; // خطأ العينة السابقة
-            for (let i = 0; i < weights.length; i++) { // حلقة التعديل الخفيف
-              weights[i] += (lr * 0.4) * pErr * prev.vec[i]; // تعديل بمعدل تعلم أقل (0.4 من الأصلي)
-            } // نهاية حلقة التعديل
-            bias += (lr * 0.4) * pErr; // تعديل الانحياز بمعدل أقل
-          } // نهاية شرط الأبعاد
-        } // نهاية شرط العينات السابقة
-      } // نهاية حلقة الجولات
-
-      const arabicName = label === "cat" ? "قطه" : "أسد"; // الاسم العربي للفئة
-      log(`تم التقاط صورة وتدريب النموذج كـ «${arabicName}» (${epochs} جولات، شبكة ${gridSize}×${gridSize}).`); // تسجيل العملية
-      resultBox.innerHTML = ` <!-- بدء بناء محتوى صندوق النتيجة -->
-        <div class="prediction-title" style="color: ${label === "cat" ? "var(--cat)" : "var(--lion)"};">
-          ✓ تم تعليم النموذج: ${arabicName} <!-- نص نجاح التعليم -->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مصنف الرؤية الذكي: قطة أم أسد (MobileNet v2)</title>
+  <!-- مكتبات TensorFlow.js و MobileNet v2 للتعلم النقلي محلياً في المتصفح -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1"></script>
+  <style>
+    :root {
+      --bg: #0b1120;
+      --card: #162033;
+      --card-2: #0f172a;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --cat: #22c55e;
+      --lion: #f59e0b;
+      --other: #64748b;
+      --test: #8b5cf6;
+      --danger: #ef4444;
+      --warn: #eab308;
+      --border: #283548;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      padding: 18px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+    }
+
+    header {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 22px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    header h1 {
+      margin: 0 0 4px;
+      font-size: 1.35rem;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .status-badge {
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      background: #1e293b;
+      border: 1px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--warn);
+      display: inline-block;
+    }
+    .dot.ready { background: var(--cat); box-shadow: 0 0 8px var(--cat); }
+    .dot.error { background: var(--danger); }
+
+    .grid-main {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 18px;
+    }
+
+    @media (max-width: 860px) {
+      .grid-main { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .card h2 {
+      margin: 0 0 14px;
+      font-size: 1.08rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .camera-box {
+      position: relative;
+      background: var(--card-2);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      aspect-ratio: 4 / 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    video, canvas.preview {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .crop-guide {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .crop-square {
+      height: 86%;
+      aspect-ratio: 1 / 1;
+      border: 2px dashed rgba(56, 189, 248, 0.45);
+      border-radius: 12px;
+    }
+
+    .camera-placeholder {
+      color: var(--muted);
+      text-align: center;
+      padding: 20px;
+      font-size: 0.95rem;
+    }
+
+    .cam-controls, .action-buttons, .test-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    button, .file-label {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: #fff;
+      transition: transform 0.12s ease, opacity 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    button:hover:not(:disabled), .file-label:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-cam { background: #0284c7; }
+    .btn-switch { background: #334155; }
+    .btn-reset { background: #991b1b; }
+    .btn-cat { background: var(--cat); color: #052e16; flex: 1; min-width: 115px; }
+    .btn-lion { background: var(--lion); color: #271500; flex: 1; min-width: 115px; }
+    .btn-other { background: var(--other); color: #fff; flex: 1; min-width: 115px; }
+    .btn-test { background: var(--test); flex: 1.4; padding: 12px; font-size: 0.98rem; }
+    .btn-live { background: #1e293b; border: 1px solid var(--border); flex: 1; }
+    .btn-live.active { background: #0d9488; border-color: #14b8a6; }
+
+    input[type="file"] { display: none; }
+
+    .result-box {
+      margin-top: 14px;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      min-height: 125px;
+    }
+
+    .prediction-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .prob-row {
+      display: grid;
+      grid-template-columns: 75px 1fr 48px;
+      align-items: center;
+      gap: 8px;
+      margin: 6px 0;
+      font-size: 0.85rem;
+    }
+
+    .meter-wrap {
+      background: #1e293b;
+      border-radius: 999px;
+      height: 10px;
+      overflow: hidden;
+    }
+
+    .meter-bar {
+      height: 100%;
+      width: 0%;
+      transition: width 0.22s ease;
+      border-radius: 999px;
+    }
+
+    .hint-box {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border);
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .samples-section {
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .sample-group {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .sample-group-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .thumbs-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .thumb-item {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .thumb-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .thumb-del {
+      position: absolute;
+      top: 1px;
+      left: 1px;
+      width: 16px;
+      height: 16px;
+      padding: 0;
+      border-radius: 50%;
+      background: rgba(15, 23, 42, 0.85);
+      color: #fff;
+      font-size: 11px;
+      line-height: 1;
+    }
+
+    .setting-item {
+      margin-bottom: 14px;
+      background: var(--card-2);
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .setting-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+    }
+
+    .setting-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+
+    input[type="range"], select {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    select {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.88rem;
+    }
+
+    .switch-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .io-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .log {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 12px;
+      max-height: 110px;
+      overflow-y: auto;
+      background: var(--card-2);
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>🐱🦁 مصنف الرؤية الذكي: قطة أم أسد</h1>
+        <p>يعتمد على شبكة <strong>MobileNet v2</strong> لاستخراج الميزات الدلالية مع كاشف تلقائي للأجسام الغريبة (مثل الطفاية أو الأكواب).</p>
+      </div>
+      <div id="modelStatus" class="status-badge">
+        <span id="statusDot" class="dot"></span>
+        <span id="statusText">جاري تحميل MobileNet v2...</span>
+      </div>
+    </header>
+
+    <div class="grid-main">
+      <!-- العمود الأيمن: الكاميرا والتدريب والاختبار -->
+      <div class="card">
+        <h2>
+          <span>1. الكاميرا والتدريب والاختبار</span>
+          <button id="backToCamBtn" class="btn-switch" style="padding:5px 10px; font-size:0.78rem; display:none;">📹 العودة للكاميرا</button>
+        </h2>
+
+        <div class="camera-box">
+          <video id="video" autoplay playsinline muted style="display:none;"></video>
+          <canvas id="snapshotCanvas" class="preview" style="display:none;"></canvas>
+          <div id="cropGuide" class="crop-guide" style="display:none;">
+            <div class="crop-square"></div>
+          </div>
+          <div id="placeholder" class="camera-placeholder">
+            اضغط على <strong>تشغيل الكاميرا</strong> أو <strong>رفع صورة</strong> للبدء.<br/>
+            <span style="font-size:0.82rem;">المربع المتقطع يوضح منطقة التركيز التي يراها النموذج بدقة 224×224.</span>
+          </div>
         </div>
-        <div style="color: var(--muted); font-size: 0.9rem;">
-          تمت إضافة اللقطة وتحديث الأوزان عبر ${epochs} جولات تدريب. أضف المزيد من الصور أو اضغط «اختبار». <!-- إرشاد إضافي -->
+
+        <div class="cam-controls">
+          <button id="startCamBtn" class="btn-cam">📷 تشغيل الكاميرا</button>
+          <button id="switchCamBtn" class="btn-switch" disabled>🔄 تبديل الكاميرا</button>
+          <label class="file-label btn-switch">
+            🖼️ رفع صورة
+            <input type="file" id="imageUpload" accept="image/*" />
+          </label>
+          <button id="resetBtn" class="btn-reset">🗑️ تصفير</button>
         </div>
-      `; // نهاية بناء المحتوى
-    } // نهاية دالة التدريب
 
-    function cosineSimilarity(a, b) { // دالة حساب تشابه الجيب التمام بين متجهين
-      if (!a || !b || a.length !== b.length) return 0; // تحقق من الصلاحية وتطابق الأبعاد
-      let dot = 0; // متغير لحاصل الضرب النقطي
-      for (let i = 0; i < a.length; i++) dot += a[i] * b[i]; // جمع حواصل ضرب العناصر المتناظرة
-      return dot; // المتجهات مطبّعة مسبقاً بـ L2 لذا الناتج هو التشابه
-    } // نهاية الدالة
+        <div class="action-buttons">
+          <button id="trainCatBtn" class="btn-cat" disabled>🐱 تعليم: قطة</button>
+          <button id="trainLionBtn" class="btn-lion" disabled>🦁 تعليم: أسد</button>
+          <button id="trainOtherBtn" class="btn-other" disabled>🚫 أخرى (اختياري)</button>
+        </div>
 
-    // اختبار الصورة الحالية وتخمين النتيجة
-    function testCurrentFrame() { // دالة التخمين
-      const catCount = samples.filter(s => s.label === "cat").length; // عدد عينات القطط
-      const lionCount = samples.filter(s => s.label === "lion").length; // عدد عينات الأسود
+        <div class="test-row">
+          <button id="testBtn" class="btn-test" disabled>🔍 اختبار الصورة الحالية</button>
+          <button id="liveBtn" class="btn-live" disabled>⚡ اختبار مباشر: متوقف</button>
+        </div>
 
-      if (catCount === 0 || lionCount === 0) { // إذا كانت إحدى الفئتين بلا عينات
-        alert("للاختبار العادل، درّب النموذج على صورة «قطه» واحدة على الأقل وصورة «أسد» واحدة على الأقل."); // تنبيه
-        return; // اخرج من الدالة
-      } // نهاية الشرط
-
-      const frame = captureCurrentFrame(); // الحصول على الصورة/الإطار الحالي
-      if (!frame) { // إذا لم يوجد مصدر
-        alert("يرجى تشغيل الكاميرا أولاً أو رفع صورة."); // تنبيه
-        return; // اخرج من الدالة
-      } // نهاية الشرط
-
-      const gridSize = Number(gridSizeSelect.value); // قراءة حجم الشبكة
-      const threshold = Number(thresholdRange.value) / 100; // تحويل حد الثقة إلى كسر بين 0 و1
-      const vec = extractFeatures(frame, gridSize); // استخراج متجه ميزات الصورة الحالية
-      ensureWeights(vec.length); // التأكد من مطابقة الأوزان للأبعاد
-
-      // حساب تشابه الجيب التمام مع أقرب أمثلة القطط والأسود
-      let maxCatSim = -1; // أعلى تشابه مع القطط (يبدأ بقيمة سالبة)
-      let maxLionSim = -1; // أعلى تشابه مع الأسود
-      for (const s of samples) { // المرور على كل عينة تدريب
-        if (s.vec.length !== vec.length) continue; // تجاهل العينات ذات أبعاد مختلفة
-        const sim = cosineSimilarity(vec, s.vec); // حساب التشابه مع العينة
-        if (s.label === "cat" && sim > maxCatSim) maxCatSim = sim; // تحديث أعلى تشابه قطط
-        if (s.label === "lion" && sim > maxLionSim) maxLionSim = sim; // تحديث أعلى تشابه أسود
-      } // نهاية حلقة العينات
-
-      // دمج احتمالية الشبكة الخطية مع التشابه البصري
-      let z = bias; // بداية الحساب بالانحياز
-      for (let i = 0; i < vec.length; i++) z += weights[i] * vec[i]; // الضرب النقطي مع الأوزان
-      const modelLionProb = sigmoid(z); // احتمال أن تكون الصورة أسداً حسب النموذج الخطي
-
-      const simDiff = maxLionSim - maxCatSim; // الفرق بين أعلى تشابه أسود وأعلى تشابه قطط
-      const simLionProb = sigmoid(simDiff * 14); // تحويل الفرق إلى احتمال (معامل 14 لتقوية الحساسية)
-      const finalLionProb = 0.55 * modelLionProb + 0.45 * simLionProb; // الدمج الموزون (55% نموذج + 45% تشابه)
-      const finalCatProb = 1 - finalLionProb; // احتمال القطة هو مكمل احتمال الأسد
-
-      const isLion = finalLionProb >= 0.5; // القرار: أسد إذا كان احتماله 50% أو أكثر
-      const confidence = isLion ? finalLionProb : finalCatProb; // الثقة = احتمال الفئة المختارة
-      const confidencePct = Math.round(confidence * 100); // تحويل الثقة إلى نسبة مئوية صحيحة
-      const catPct = Math.round(finalCatProb * 100); // نسبة احتمال القطة مئوياً
-      const lionPct = 100 - catPct; // نسبة احتمال الأسد (مكملة)
-
-      const labelText = isLion ? "أسد 🦁" : "قطه 🐱"; // نص الفئة المتوقعة
-      const color = isLion ? "var(--lion)" : "var(--cat)"; // لون الفئة المتوقعة
-
-      let verdictHtml = ""; // متغير لتخزين كود HTML النهائي للحكم
-      if (confidence < threshold) { // إذا كانت الثقة أقل من الحد المطلوب
-        verdictHtml = ` <!-- بدء رسالة عدم كفاية الثقة -->
-          <div class="prediction-title" style="color: var(--danger);">
-            ⚠️ دقة غير كافية للجزم (الثقة ${confidencePct}% أقل من الحد المطلوب ${thresholdRange.value}%) <!-- نص التحذير -->
+        <div id="resultBox" class="result-box">
+          <div class="prediction-title">بانتظار جاهزية النموذج والتدريب...</div>
+          <div style="color: var(--muted); font-size: 0.88rem;">
+            درّب النموذج على <strong>4 إلى 10 صور</strong> واضحة لكل من «قطة» و«أسد»، ثم اختبره على قطة أو أسد أو حتى جسم غريب للتأكد من رفضه.
           </div>
-          <div style="font-size: 0.9rem; color: var(--muted);">
-            التخمين الأقرب: <strong>${labelText}</strong> — يُنصح بإضافة صور تدريب أوخفض حد الثقة من الإعدادات. <!-- النصيحة -->
+        </div>
+
+        <!-- عرض مصغرات عينات التدريب مع إمكانية الحذف الفردي -->
+        <div class="samples-section">
+          <div class="sample-group">
+            <div class="sample-group-header">
+              <span style="color:var(--cat);">🐱 عينات القطة (<span id="catCount">0</span>)</span>
+              <span style="color:var(--muted); font-weight:400; font-size:0.78rem;">اضغط × لحذف لقطة</span>
+            </div>
+            <div id="catThumbs" class="thumbs-grid"></div>
           </div>
-        `; // نهاية الرسالة
-      } else { // إذا كانت الثقة كافية
-        verdictHtml = ` <!-- بدء رسالة النتيجة الواضحة -->
-          <div class="prediction-title" style="color: ${color};">
-            التخمين: ${labelText} (${confidencePct}%) <!-- نص النتيجة -->
+
+          <div class="sample-group">
+            <div class="sample-group-header">
+              <span style="color:var(--lion);">🦁 عينات الأسد (<span id="lionCount">0</span>)</span>
+              <span style="color:var(--muted); font-weight:400; font-size:0.78rem;">اضغط × لحذف لقطة</span>
+            </div>
+            <div id="lionThumbs" class="thumbs-grid"></div>
           </div>
-          <div style="font-size: 0.9rem; color: var(--muted);">
-            احتمالية قطة: <strong>${catPct}%</strong> | احتمالية أسد: <strong>${lionPct}%</strong> <!-- النسب التفصيلية -->
+
+          <div id="otherGroup" class="sample-group" style="display:none;">
+            <div class="sample-group-header">
+              <span style="color:#cbd5e1;">🚫 عينات أخرى / خلفية (<span id="otherCount">0</span>)</span>
+              <span style="color:var(--muted); font-weight:400; font-size:0.78rem;">فئة سلبية مساعدة</span>
+            </div>
+            <div id="otherThumbs" class="thumbs-grid"></div>
           </div>
-        `; // نهاية الرسالة
-      } // نهاية شرط الثقة
+        </div>
+      </div>
 
-      resultBox.innerHTML = ` <!-- بناء محتوى صندوق النتيجة النهائي -->
-        ${verdictHtml} <!-- إدراج نص الحكم -->
-        <div class="meter-wrap"> <!-- حاوية شريط القياس -->
-          <div class="meter-bar" style="width: ${confidencePct}%; background: ${confidence < threshold ? "var(--danger)" : color};"></div> <!-- عرض النسبة بلون التحذير إن كانت الثقة منخفضة -->
-        </div> <!-- نهاية الحاوية -->
-      `; // نهاية البناء
+      <!-- العمود الأيسر: الإعدادات الاحترافية والسجل -->
+      <div class="card">
+        <h2>2. إعدادات الدقة وكشف الأجسام الغريبة</h2>
 
-      log(`نتيجة الاختبار: ${isLion ? "أسد" : "قطه"} بنسبة ثقة ${confidencePct}%.`); // تسجيل النتيجة في السجل
-    } // نهاية دالة الاختبار
+        <div class="setting-item">
+          <div class="setting-header">
+            <span>حد رفض الأجسام الغريبة (OOD Threshold)</span>
+            <span id="oodVal">58%</span>
+          </div>
+          <input type="range" id="oodRange" min="40" max="80" value="58" />
+          <div class="setting-desc">
+            أهم إعداد لمنع التصنيف الخاطئ لطفاية السجائر أو الأشياء غير المتعلقة: إذا كان أقصى تشابه دلالي مع صورك أقل من هذا الحد، يرفض النموذج التخمين. (55%–62% مثالي للصور الحقيقية).
+          </div>
+        </div>
 
-    trainCatBtn.addEventListener("click", () => trainOnSample("cat")); // ربط زر القطة بتدريب العينة الحالية كقطة
-    trainLionBtn.addEventListener("click", () => trainOnSample("lion")); // ربط زر الأسد بتدريب العينة الحالية كأسد
-    testBtn.addEventListener("click", testCurrentFrame); // ربط زر الاختبار بدالة التخمين
+        <div class="setting-item">
+          <div class="setting-header">
+            <span>حد الثقة المطلوب للقرار</span>
+            <span id="confVal">65%</span>
+          </div>
+          <input type="range" id="confRange" min="52" max="92" value="65" />
+          <div class="setting-desc">
+            الفارق المطلوب للجزم بين «قطة» و«أسد» عند تقارب الملامح (مثلاً شبل أسد أو قطة برتقالية).
+          </div>
+        </div>
 
-    resetBtn.addEventListener("click", () => { // عند الضغط على زر التصفير
-      samples = []; // تفريغ كل عينات التدريب
-      weights = null; // إلغاء الأوزان
-      bias = 0; // تصفير الانحياز
-      updateStats(); // تحديث العدادات إلى صفر
-      resultBox.innerHTML = ` <!-- بناء رسالة التصفير -->
-        <div class="prediction-title">تم تصفير النموذج</div> <!-- عنوان الرسالة -->
-        <div style="color: var(--muted); font-size: 0.9rem;">يمكنك البدء بتدريب جديد من الصفر الآن.</div> <!-- إرشاد -->
-      `; // نهاية البناء
-      log("تم مسح جميع عينات التدريب والأوزان."); // تسجيل عملية المسح
-    }); // نهاية مستمع التصفير
-  </script> <!-- نهاية كود جافاسكريبت -->
-</body> <!-- نهاية جسم الصفحة -->
-</html> <!-- نهاية المستند -->
+        <div class="setting-item">
+          <div class="setting-header">
+            <span>أسلوب التصنيف والدمج</span>
+            <span id="modeLabel">متوازن</span>
+          </div>
+          <select id="modeSelect">
+            <option value="0.5" selected>متوازن — دمج المصنف الخطي + أقرب الأمثلة (موصى به)</option>
+            <option value="0.8">صارم — الاعتماد الأكبر على أقرب صور التدريب مباشرة</option>
+            <option value="0.25">مرن — تعميم أوسع للزوايا والإضاءة المختلفة</option>
+          </select>
+        </div>
+
+        <div class="setting-item">
+          <label class="switch-row">
+            <span>مضاعفة البيانات بعكس الصورة أفقياً</span>
+            <input type="checkbox" id="augmentCheck" checked style="width:18px; height:18px;" />
+          </label>
+          <div class="setting-desc">
+            يُنشئ تلقائياً نسخة معكوسة لكل صورة تدريبية حتى يتعرف النموذج على القطة والأسد من اليمين واليسار بنفس الكفاءة.
+          </div>
+        </div>
+
+        <div class="setting-item">
+          <label class="switch-row">
+            <span>إظهار تلميح MobileNet العام (تشخيصي)</span>
+            <input type="checkbox" id="hintCheck" checked style="width:18px; height:18px;" />
+          </label>
+          <div class="setting-desc">
+            يعرض اسم الكائن الذي تراه الشبكة الأساسية (مثل: tabby cat, lion, ashtray) أسفل النتيجة لمساعدتك في التحقق.
+          </div>
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-header" style="margin-bottom:4px;">
+            <span>حفظ ومشاركة النموذج المدرَّب</span>
+          </div>
+          <div class="setting-desc" style="margin-top:0;">
+            يتم حفظ العينات تلقائياً في المتصفح. يمكنك أيضاً تصديرها كملف أو استيرادها لاحقاً:
+          </div>
+          <div class="io-buttons">
+            <button id="exportBtn" class="btn-switch" style="flex:1; font-size:0.82rem;">💾 تصدير JSON</button>
+            <label class="file-label btn-switch" style="flex:1; font-size:0.82rem;">
+              📂 استيراد JSON
+              <input type="file" id="importInput" accept="application/json" />
+            </label>
+          </div>
+        </div>
+
+        <div id="logBox" class="log">سجل العمليات جاهز.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- كانفاس معالجة مخفي بمقاس إدخال MobileNet القياسي -->
+  <canvas id="cropCanvas" width="224" height="224" style="display:none;"></canvas>
+  <canvas id="flipCanvas" width="224" height="224" style="display:none;"></canvas>
+  <canvas id="thumbCanvas" width="64" height="64" style="display:none;"></canvas>
+
+  <script>
+    const STORAGE_KEY = "cat_lion_mobilenet_v2_samples_v1";
+
+    // عناصر الواجهة
+    const video = document.getElementById("video");
+    const snapshotCanvas = document.getElementById("snapshotCanvas");
+    const placeholder = document.getElementById("placeholder");
+    const cropGuide = document.getElementById("cropGuide");
+    const cropCanvas = document.getElementById("cropCanvas");
+    const flipCanvas = document.getElementById("flipCanvas");
+    const thumbCanvas = document.getElementById("thumbCanvas");
+
+    const statusDot = document.getElementById("statusDot");
+    const statusText = document.getElementById("statusText");
+
+    const startCamBtn = document.getElementById("startCamBtn");
+    const switchCamBtn = document.getElementById("switchCamBtn");
+    const backToCamBtn = document.getElementById("backToCamBtn");
+    const imageUpload = document.getElementById("imageUpload");
+    const resetBtn = document.getElementById("resetBtn");
+
+    const trainCatBtn = document.getElementById("trainCatBtn");
+    const trainLionBtn = document.getElementById("trainLionBtn");
+    const trainOtherBtn = document.getElementById("trainOtherBtn");
+    const testBtn = document.getElementById("testBtn");
+    const liveBtn = document.getElementById("liveBtn");
+
+    const catCountEl = document.getElementById("catCount");
+    const lionCountEl = document.getElementById("lionCount");
+    const otherCountEl = document.getElementById("otherCount");
+    const otherGroupEl = document.getElementById("otherGroup");
+    const catThumbsEl = document.getElementById("catThumbs");
+    const lionThumbsEl = document.getElementById("lionThumbs");
+    const otherThumbsEl = document.getElementById("otherThumbs");
+
+    const resultBox = document.getElementById("resultBox");
+    const logBox = document.getElementById("logBox");
+
+    const oodRange = document.getElementById("oodRange");
+    const oodVal = document.getElementById("oodVal");
+    const confRange = document.getElementById("confRange");
+    const confVal = document.getElementById("confVal");
+    const modeSelect = document.getElementById("modeSelect");
+    const modeLabel = document.getElementById("modeLabel");
+    const augmentCheck = document.getElementById("augmentCheck");
+    const hintCheck = document.getElementById("hintCheck");
+    const exportBtn = document.getElementById("exportBtn");
+    const importInput = document.getElementById("importInput");
+
+    // حالة التطبيق والنموذج
+    let mobilenetModel = null;
+    let stream = null;
+    let facingMode = "environment";
+    let hasUploadedSource = false;
+    let isLiveMode = false;
+    let liveTimer = null;
+    let isBusy = false;
+
+    /**
+     * كل عينة:
+     * { id: string, label: 'cat'|'lion'|'other', vec: number[], flipVec: number[]|null, thumb: string }
+     */
+    let samples = [];
+
+    // أوزان المصنف الخطي (L2-Regularized Balanced Softmax)
+    let linearHead = null; // { classes: string[], W: Float32Array[], b: Float32Array }
+
+    function log(msg) {
+      const time = new Date().toLocaleTimeString("ar-EG");
+      logBox.innerHTML = `<div>[${time}] ${msg}</div>` + logBox.innerHTML;
+    }
+
+    // --- تحميل MobileNet v2 ---
+    async function initMobileNet() {
+      try {
+        statusDot.className = "dot";
+        statusText.textContent = "جاري تحميل MobileNet v2...";
+        mobilenetModel = await mobilenet.load({ version: 2, alpha: 1.0 });
+
+        // تسخين النموذج (Warmup) لتسريع أول اختبار فعلي
+        const warmCtx = cropCanvas.getContext("2d");
+        warmCtx.fillStyle = "#000";
+        warmCtx.fillRect(0, 0, 224, 224);
+        const warmTensor = mobilenetModel.infer(cropCanvas, true);
+        await warmTensor.data();
+        warmTensor.dispose();
+
+        statusDot.className = "dot ready";
+        statusText.textContent = "MobileNet v2 جاهز";
+        [trainCatBtn, trainLionBtn, trainOtherBtn, testBtn, liveBtn].forEach(b => b.disabled = false);
+        log("تم تحميل نموذج MobileNet v2 (1280 ميزة دلالية) بنجاح.");
+
+        loadFromStorage();
+      } catch (err) {
+        statusDot.className = "dot error";
+        statusText.textContent = "فشل تحميل النموذج";
+        log(`خطأ في تحميل MobileNet: ${err.message}. تأكد من الاتصال بالإنترنت.`);
+      }
+    }
+
+    // --- إدارة الكاميرا والصور ---
+    async function startCamera() {
+      try {
+        if (stream) stream.getTracks().forEach(t => t.stop());
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode, width: { ideal: 640 }, height: { ideal: 480 } },
+          audio: false
+        });
+        video.srcObject = stream;
+        showCameraView();
+        switchCamBtn.disabled = false;
+        log("تم تشغيل الكاميرا بنجاح.");
+      } catch (err) {
+        log(`تعذر فتح الكاميرا (${err.message}).`);
+        alert("تعذر الوصول إلى الكاميرا. تأكد من الصلاحية أو استخدم زر «رفع صورة».");
+      }
+    }
+
+    function showCameraView() {
+      hasUploadedSource = false;
+      snapshotCanvas.style.display = "none";
+      placeholder.style.display = "none";
+      video.style.display = "block";
+      cropGuide.style.display = "flex";
+      backToCamBtn.style.display = "none";
+    }
+
+    startCamBtn.addEventListener("click", startCamera);
+
+    switchCamBtn.addEventListener("click", () => {
+      facingMode = facingMode === "environment" ? "user" : "environment";
+      startCamera();
+    });
+
+    backToCamBtn.addEventListener("click", () => {
+      if (stream) {
+        showCameraView();
+      } else {
+        startCamera();
+      }
+    });
+
+    imageUpload.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      stopLiveMode();
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          snapshotCanvas.width = img.width;
+          snapshotCanvas.height = img.height;
+          snapshotCanvas.getContext("2d").drawImage(img, 0, 0);
+          video.style.display = "none";
+          placeholder.style.display = "none";
+          snapshotCanvas.style.display = "block";
+          cropGuide.style.display = "flex";
+          hasUploadedSource = true;
+          if (stream) backToCamBtn.style.display = "inline-flex";
+          log(`تم تحميل الصورة: ${file.name}`);
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+      imageUpload.value = "";
+    });
+
+    function getActiveVisualSource() {
+      if (hasUploadedSource && snapshotCanvas.width > 0) return snapshotCanvas;
+      if (video.srcObject && video.readyState >= 2) return video;
+      return null;
+    }
+
+    // قص مربع مركزي بمقاس 224×224 لمنع مطّ الصورة وتوحيد الأبعاد
+    function drawCenterCropTo224(source) {
+      const sw = source instanceof HTMLVideoElement ? source.videoWidth : source.width;
+      const sh = source instanceof HTMLVideoElement ? source.videoHeight : source.height;
+      const side = Math.min(sw, sh);
+      const sx = (sw - side) / 2;
+      const sy = (sh - side) / 2;
+      const ctx = cropCanvas.getContext("2d");
+      ctx.drawImage(source, sx, sy, side, side, 0, 0, 224, 224);
+
+      const tctx = thumbCanvas.getContext("2d");
+      tctx.drawImage(cropCanvas, 0, 0, 64, 64);
+      return thumbCanvas.toDataURL("image/jpeg", 0.72);
+    }
+
+    // استخراج متجه MobileNet وتطبيعه بـ L2
+    async function extractEmbedding(canvasEl) {
+      const tensor = mobilenetModel.infer(canvasEl, true);
+      try {
+        const raw = await tensor.data();
+        let normSq = 0;
+        for (let i = 0; i < raw.length; i++) normSq += raw[i] * raw[i];
+        const norm = Math.sqrt(normSq) || 1;
+        const vec = new Array(raw.length);
+        for (let i = 0; i < raw.length; i++) vec[i] = raw[i] / norm;
+        return vec;
+      } finally {
+        tensor.dispose();
+      }
+    }
+
+    async function extractFlippedEmbedding() {
+      const fctx = flipCanvas.getContext("2d");
+      fctx.save();
+      fctx.translate(224, 0);
+      fctx.scale(-1, 1);
+      fctx.drawImage(cropCanvas, 0, 0);
+      fctx.restore();
+      return extractEmbedding(flipCanvas);
+    }
+
+    // --- خوارزميات الرياضيات والتصنيف ---
+    function dot(a, b) {
+      let s = 0;
+      for (let i = 0; i < a.length; i++) s += a[i] * b[i];
+      return s;
+    }
+
+    function softmax(logits) {
+      let max = -Infinity;
+      for (let i = 0; i < logits.length; i++) if (logits[i] > max) max = logits[i];
+      const exps = new Array(logits.length);
+      let sum = 0;
+      for (let i = 0; i < logits.length; i++) {
+        exps[i] = Math.exp(logits[i] - max);
+        sum += exps[i];
+      }
+      for (let i = 0; i < logits.length; i++) exps[i] /= sum;
+      return exps;
+    }
+
+    // إعادة تدريب الرأس الخطي على جميع العينات بموازنة الفئات + تنظيم L2
+    function retrainLinearHead() {
+      const counts = { cat: 0, lion: 0, other: 0 };
+      samples.forEach(s => counts[s.label]++);
+
+      if (counts.cat === 0 || counts.lion === 0) {
+        linearHead = null;
+        return;
+      }
+
+      const classes = counts.other > 0 ? ["cat", "lion", "other"] : ["cat", "lion"];
+      const C = classes.length;
+      const useAug = augmentCheck.checked;
+
+      // تجميع أزواج التدريب مع أوزان عكسية لتعويض تفاوت عدد الصور بين الفئات
+      const trainItems = [];
+      for (const s of samples) {
+        const cIdx = classes.indexOf(s.label);
+        if (cIdx === -1) continue;
+        const w = 1 / (C * counts[s.label]);
+        trainItems.push({ cIdx, vec: s.vec, weight: w });
+        if (useAug && s.flipVec) {
+          trainItems.push({ cIdx, vec: s.flipVec, weight: w });
+        }
+      }
+
+      // تطبيع أوزان العينات بحيث يكون المجموع = 1
+      let totalW = 0;
+      for (const it of trainItems) totalW += it.weight;
+      for (const it of trainItems) it.weight /= totalW;
+
+      const D = trainItems[0].vec.length;
+      const W = Array.from({ length: C }, () => new Float32Array(D));
+      const b = new Float32Array(C);
+
+      const epochs = 85;
+      const lr = 1.2;
+      const reg = 0.004;
+
+      const gradW = Array.from({ length: C }, () => new Float32Array(D));
+      const gradB = new Float32Array(C);
+
+      for (let ep = 0; ep < epochs; ep++) {
+        for (let c = 0; c < C; c++) {
+          gradW[c].fill(0);
+          gradB[c] = 0;
+        }
+
+        for (let n = 0; n < trainItems.length; n++) {
+          const item = trainItems[n];
+          const x = item.vec;
+          const logits = new Array(C);
+          for (let c = 0; c < C; c++) logits[c] = b[c] + dot(W[c], x);
+          const probs = softmax(logits);
+
+          for (let c = 0; c < C; c++) {
+            const diff = (probs[c] - (c === item.cIdx ? 1 : 0)) * item.weight;
+            gradB[c] += diff;
+            for (let j = 0; j < D; j++) gradW[c][j] += diff * x[j];
+          }
+        }
+
+        for (let c = 0; c < C; c++) {
+          b[c] -= lr * gradB[c];
+          for (let j = 0; j < D; j++) {
+            W[c][j] -= lr * (gradW[c][j] + reg * W[c][j]);
+          }
+        }
+      }
+
+      linearHead = { classes, W, b };
+    }
+
+    // --- عرض المصغرات والحفظ ---
+    function renderSamplesUI() {
+      const map = { cat: catThumbsEl, lion: lionThumbsEl, other: otherThumbsEl };
+      Object.values(map).forEach(el => el.innerHTML = "");
+
+      let cCat = 0, cLion = 0, cOther = 0;
+      for (const s of samples) {
+        if (s.label === "cat") cCat++;
+        else if (s.label === "lion") cLion++;
+        else cOther++;
+
+        const div = document.createElement("div");
+        div.className = "thumb-item";
+        div.innerHTML = `
+          <img src="${s.thumb}" alt="${s.label}" />
+          <button class="thumb-del" title="حذف هذه اللقطة">×</button>
+        `;
+        div.querySelector(".thumb-del").addEventListener("click", () => {
+          samples = samples.filter(item => item.id !== s.id);
+          retrainLinearHead();
+          renderSamplesUI();
+          saveToStorage();
+          log("تم حذف عينة تدريب واحدة وإعادة ضبط الأوزان.");
+        });
+        map[s.label].appendChild(div);
+      }
+
+      catCountEl.textContent = cCat;
+      lionCountEl.textContent = cLion;
+      otherCountEl.textContent = cOther;
+      otherGroupEl.style.display = cOther > 0 ? "block" : "none";
+    }
+
+    function saveToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(samples));
+      } catch (e) {
+        log("تنبيه: مساحة التخزين المحلي ممتلئة، لن يتم حفظ المزيد تلقائياً.");
+      }
+    }
+
+    function loadFromStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          samples = parsed;
+          retrainLinearHead();
+          renderSamplesUI();
+          log(`تمت استعادة ${samples.length} عينة تدريب محفوظة سابقاً.`);
+        }
+      } catch (e) { /* تجاهل */ }
+    }
+
+    // --- التدريب ---
+    async function trainSample(label) {
+      if (!mobilenetModel || isBusy) return;
+      const source = getActiveVisualSource();
+      if (!source) {
+        alert("يرجى تشغيل الكاميرا أولاً أو رفع صورة.");
+        return;
+      }
+
+      isBusy = true;
+      try {
+        const thumb = drawCenterCropTo224(source);
+        const vec = await extractEmbedding(cropCanvas);
+        const flipVec = await extractFlippedEmbedding();
+
+        samples.push({
+          id: `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+          label,
+          vec,
+          flipVec,
+          thumb
+        });
+
+        retrainLinearHead();
+        renderSamplesUI();
+        saveToStorage();
+
+        const names = { cat: "قطة 🐱", lion: "أسد 🦁", other: "أخرى 🚫" };
+        const colors = { cat: "var(--cat)", lion: "var(--lion)", other: "#cbd5e1" };
+        log(`تمت إضافة عينة «${names[label]}» وتحديث المصنّف.`);
+
+        if (!isLiveMode) {
+          resultBox.innerHTML = `
+            <div class="prediction-title" style="color:${colors[label]};">✓ تم حفظ عينة التدريب: ${names[label]}</div>
+            <div style="color:var(--muted); font-size:0.88rem;">
+              أصبح لديك الآن ${catCountEl.textContent} للقطة و${lionCountEl.textContent} للأسد. أضف لقطات بزوايا متنوعة أو اضغط «اختبار».
+            </div>
+          `;
+        }
+      } finally {
+        isBusy = false;
+      }
+    }
+
+    // --- الاختبار والتخمين مع كشف الأجسام الغريبة ---
+    async function testCurrentFrame(silent = false) {
+      if (!mobilenetModel || isBusy) return;
+
+      const catCount = samples.filter(s => s.label === "cat").length;
+      const lionCount = samples.filter(s => s.label === "lion").length;
+      if (catCount === 0 || lionCount === 0 || !linearHead) {
+        if (!silent) alert("درّب النموذج على صورة «قطة» واحدة على الأقل وصورة «أسد» واحدة على الأقل.");
+        return;
+      }
+
+      const source = getActiveVisualSource();
+      if (!source) {
+        if (!silent) alert("يرجى تشغيل الكاميرا أو رفع صورة.");
+        return;
+      }
+
+      isBusy = true;
+      try {
+        drawCenterCropTo224(source);
+        const vec = await extractEmbedding(cropCanvas);
+
+        const classes = linearHead.classes;
+        const C = classes.length;
+        const useAug = augmentCheck.checked;
+
+        // 1) حساب احتمالات المصنف الخطي
+        const linLogits = new Array(C);
+        for (let c = 0; c < C; c++) {
+          linLogits[c] = linearHead.b[c] + dot(linearHead.W[c], vec);
+        }
+        const pLinear = softmax(linLogits);
+
+        // 2) حساب Top-3 Cosine Similarity لكل فئة + أقصى تشابه مطلق (للكشف عن الأجسام الغريبة)
+        const maxSim = { cat: 0, lion: 0, other: 0 };
+        const topKSim = { cat: 0, lion: 0, other: 0 };
+
+        for (const cName of classes) {
+          const sims = [];
+          for (const s of samples) {
+            if (s.label !== cName) continue;
+            sims.push(dot(vec, s.vec));
+            if (useAug && s.flipVec) sims.push(dot(vec, s.flipVec));
+          }
+          sims.sort((a, b) => b - a);
+          maxSim[cName] = sims[0] || 0;
+          const k = Math.min(3, sims.length);
+          let sum = 0;
+          for (let i = 0; i < k; i++) sum += sims[i];
+          topKSim[cName] = k > 0 ? sum / k : 0;
+        }
+
+        const knnLogits = classes.map(c => topKSim[c] * 18);
+        const pKnn = softmax(knnLogits);
+
+        // 3) الدمج الموزون حسب وضع التصنيف
+        const knnWeight = Number(modeSelect.value);
+        const probs = {};
+        for (let c = 0; c < C; c++) {
+          probs[classes[c]] = (1 - knnWeight) * pLinear[c] + knnWeight * pKnn[c];
+        }
+
+        // تحديد الفائز
+        let winner = classes[0];
+        for (const c of classes) {
+          if (probs[c] > probs[winner]) winner = c;
+        }
+
+        const oodThreshold = Number(oodRange.value) / 100;
+        const confThreshold = Number(confRange.value) / 100;
+
+        // أعلى تشابه دلالي مع الفئات المستهدفة
+        const bestAnySim = Math.max(maxSim.cat, maxSim.lion, maxSim.other || 0);
+        const bestSimPct = Math.round(bestAnySim * 100);
+        const catSimPct = Math.round(maxSim.cat * 100);
+        const lionSimPct = Math.round(maxSim.lion * 100);
+
+        // 4) تلميح MobileNet العام (اختياري)
+        let hintHtml = "";
+        if (hintCheck.checked) {
+          const topPreds = await mobilenetModel.classify(cropCanvas, 2);
+          if (topPreds && topPreds.length > 0) {
+            const labelsStr = topPreds.map(p => `${p.className} (${Math.round(p.probability * 100)}%)`).join(" ، ");
+            hintHtml = `<div class="hint-box">💡 الرؤية الأساسية (MobileNet) تلاحظ: <strong>${labelsStr}</strong></div>`;
+          }
+        }
+
+        // 5) بناء النتيجة
+        const catPct = Math.round((probs.cat || 0) * 100);
+        const lionPct = Math.round((probs.lion || 0) * 100);
+        const otherPct = classes.includes("other") ? Math.max(0, 100 - catPct - lionPct) : 0;
+
+        let headerHtml = "";
+
+        if (bestAnySim < oodThreshold) {
+          // كشف جسم غريب (مثل طفاية السجائر)
+          headerHtml = `
+            <div class="prediction-title" style="color: var(--danger);">
+              🚫 جسم غريب / خارج نطاق التدريب
+            </div>
+            <div style="font-size:0.86rem; color: var(--muted); margin-bottom:8px;">
+              هذه الصورة لا تشبه القطة (تشابه ${catSimPct}%) ولا الأسد (تشابه ${lionSimPct}%) بشكل كافٍ — المطلوب ≥ ${oodRange.value}%.
+            </div>
+          `;
+          if (!silent) log(`تم رفض الصورة كجسم غريب (أقصى تشابه دلالي ${bestSimPct}%).`);
+        } else if (winner === "other") {
+          headerHtml = `
+            <div class="prediction-title" style="color: #cbd5e1;">
+              🚫 النتيجة: جسم آخر / ليس قطة ولا أسداً (${otherPct}%)
+            </div>
+            <div style="font-size:0.86rem; color: var(--muted); margin-bottom:8px;">
+              تطابقت الصورة مع فئة «أخرى» التي درّبتها.
+            </div>
+          `;
+          if (!silent) log(`نتيجة الاختبار: أخرى (${otherPct}%).`);
+        } else {
+          const winConf = probs[winner];
+          const winConfPct = Math.round(winConf * 100);
+          const winLabel = winner === "cat" ? "قطة 🐱" : "أسد 🦁";
+          const winColor = winner === "cat" ? "var(--cat)" : "var(--lion)";
+
+          if (winConf < confThreshold) {
+            headerHtml = `
+              <div class="prediction-title" style="color: var(--warn);">
+                ⚠️ احتمال متقارب (الأقرب: ${winLabel} بنسبة ${winConfPct}%)
+              </div>
+              <div style="font-size:0.86rem; color: var(--muted); margin-bottom:8px;">
+                الثقة أقل من الحد المطلوب (${confRange.value}%). قرّب الكاميرا أو أضف عينات تدريب إضافية.
+              </div>
+            `;
+          } else {
+            headerHtml = `
+              <div class="prediction-title" style="color: ${winColor};">
+                ✓ التخمين: ${winLabel} (${winConfPct}%)
+              </div>
+              <div style="font-size:0.84rem; color: var(--muted); margin-bottom:8px;">
+                أعلى تشابه دلالي: قطة ${catSimPct}% | أسد ${lionSimPct}%
+              </div>
+            `;
+          }
+          if (!silent) log(`نتيجة الاختبار: ${winLabel} (${winConfPct}%).`);
+        }
+
+        const barsHtml = `
+          <div class="prob-row">
+            <span style="color:var(--cat); font-weight:700;">🐱 قطة</span>
+            <div class="meter-wrap"><div class="meter-bar" style="width:${catPct}%; background:var(--cat);"></div></div>
+            <span>${catPct}%</span>
+          </div>
+          <div class="prob-row">
+            <span style="color:var(--lion); font-weight:700;">🦁 أسد</span>
+            <div class="meter-wrap"><div class="meter-bar" style="width:${lionPct}%; background:var(--lion);"></div></div>
+            <span>${lionPct}%</span>
+          </div>
+          ${classes.includes("other") ? `
+          <div class="prob-row">
+            <span style="color:#cbd5e1; font-weight:700;">🚫 أخرى</span>
+            <div class="meter-wrap"><div class="meter-bar" style="width:${otherPct}%; background:var(--other);"></div></div>
+            <span>${otherPct}%</span>
+          </div>` : ""}
+        `;
+
+        resultBox.innerHTML = headerHtml + barsHtml + hintHtml;
+      } finally {
+        isBusy = false;
+      }
+    }
+
+    // --- وضع الاختبار المباشر ---
+    function stopLiveMode() {
+      isLiveMode = false;
+      if (liveTimer) clearInterval(liveTimer);
+      liveTimer = null;
+      liveBtn.classList.remove("active");
+      liveBtn.textContent = "⚡ اختبار مباشر: متوقف";
+    }
+
+    liveBtn.addEventListener("click", () => {
+      if (isLiveMode) {
+        stopLiveMode();
+        return;
+      }
+      const catCount = samples.filter(s => s.label === "cat").length;
+      const lionCount = samples.filter(s => s.label === "lion").length;
+      if (catCount === 0 || lionCount === 0) {
+        alert("درّب النموذج على صورة «قطة» وصورة «أسد» أولاً قبل تفعيل الاختبار المباشر.");
+        return;
+      }
+      if (!getActiveVisualSource()) {
+        alert("شغّل الكاميرا أولاً لتفعيل الاختبار المباشر.");
+        return;
+      }
+      isLiveMode = true;
+      liveBtn.classList.add("active");
+      liveBtn.textContent = "⚡ اختبار مباشر: يعمل";
+      liveTimer = setInterval(() => {
+        if (!hasUploadedSource && video.readyState >= 2) {
+          testCurrentFrame(true);
+        }
+      }, 420);
+    });
+
+    // --- أحداث الأزرار والإعدادات ---
+    trainCatBtn.addEventListener("click", () => trainSample("cat"));
+    trainLionBtn.addEventListener("click", () => trainSample("lion"));
+    trainOtherBtn.addEventListener("click", () => trainSample("other"));
+    testBtn.addEventListener("click", () => testCurrentFrame(false));
+
+    resetBtn.addEventListener("click", () => {
+      stopLiveMode();
+      samples = [];
+      linearHead = null;
+      localStorage.removeItem(STORAGE_KEY);
+      renderSamplesUI();
+      resultBox.innerHTML = `
+        <div class="prediction-title">تم تصفير النموذج بالكامل</div>
+        <div style="color: var(--muted); font-size: 0.88rem;">يمكنك البدء بتدريب جديد من الصفر الآن.</div>
+      `;
+      log("تم مسح جميع عينات التدريب والأوزان.");
+    });
+
+    oodRange.addEventListener("input", () => {
+      oodVal.textContent = `${oodRange.value}%`;
+    });
+
+    confRange.addEventListener("input", () => {
+      confVal.textContent = `${confRange.value}%`;
+    });
+
+    modeSelect.addEventListener("change", () => {
+      const labels = { "0.5": "متوازن", "0.8": "صارم", "0.25": "مرن" };
+      modeLabel.textContent = labels[modeSelect.value] || "متوازن";
+    });
+
+    augmentCheck.addEventListener("change", () => {
+      retrainLinearHead();
+      log(augmentCheck.checked ? "تم تفعيل النسخ المعكوسة أفقياً." : "تم إيقاف النسخ المعكوسة أفقياً.");
+    });
+
+    // تصدير واستيراد JSON
+    exportBtn.addEventListener("click", () => {
+      if (samples.length === 0) {
+        alert("لا توجد عينات تدريب لتصديرها.");
+        return;
+      }
+      const blob = new Blob([JSON.stringify(samples)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "cat-lion-model.json";
+      a.click();
+      URL.revokeObjectURL(url);
+      log("تم تصدير ملف النموذج (cat-lion-model.json).");
+    });
+
+    importInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const parsed = JSON.parse(ev.target.result);
+          if (!Array.isArray(parsed) || !parsed[0]?.vec) throw new Error("صيغة ملف غير صالحة");
+          samples = parsed;
+          retrainLinearHead();
+          renderSamplesUI();
+          saveToStorage();
+          log(`تم استيراد ${samples.length} عينة تدريب بنجاح.`);
+        } catch (err) {
+          alert("تعذر قراءة الملف: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+      importInput.value = "";
+    });
+
+    // بدء التشغيل
+    initMobileNet();
+  </script>
+</body>
+</html>

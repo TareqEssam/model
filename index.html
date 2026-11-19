@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>مصنف الرؤية الذكي: قطة أم أسد (MobileNet v2)</title>
-  <!-- مكتبات TensorFlow.js و MobileNet v2 للتعلم النقلي محلياً في المتصفح -->
+  <title>مدرب الرؤية الذكي لفاقدي البصر — فئات ومجلدات غير محدودة</title>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1"></script>
   <style>
@@ -15,12 +14,10 @@
       --text: #f8fafc;
       --muted: #94a3b8;
       --accent: #38bdf8;
-      --cat: #22c55e;
-      --lion: #f59e0b;
-      --other: #64748b;
-      --test: #8b5cf6;
+      --ok: #22c55e;
+      --warn: #f59e0b;
       --danger: #ef4444;
-      --warn: #eab308;
+      --purple: #8b5cf6;
       --border: #283548;
     }
 
@@ -33,22 +30,22 @@
       margin: 0;
       background: var(--bg);
       color: var(--text);
-      padding: 18px;
-      line-height: 1.6;
+      padding: 16px;
+      line-height: 1.55;
     }
 
     .container {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto;
       display: grid;
-      gap: 18px;
+      gap: 16px;
     }
 
     header {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 18px 22px;
+      padding: 16px 20px;
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
@@ -58,13 +55,13 @@
 
     header h1 {
       margin: 0 0 4px;
-      font-size: 1.35rem;
+      font-size: 1.3rem;
     }
 
     header p {
       margin: 0;
       color: var(--muted);
-      font-size: 0.92rem;
+      font-size: 0.9rem;
     }
 
     .status-badge {
@@ -72,12 +69,11 @@
       border-radius: 999px;
       font-size: 0.85rem;
       font-weight: 700;
-      background: #1e293b;
+      background: var(--card-2);
       border: 1px solid var(--border);
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      white-space: nowrap;
     }
 
     .dot {
@@ -85,18 +81,18 @@
       height: 10px;
       border-radius: 50%;
       background: var(--warn);
-      display: inline-block;
     }
-    .dot.ready { background: var(--cat); box-shadow: 0 0 8px var(--cat); }
+    .dot.ready { background: var(--ok); box-shadow: 0 0 8px var(--ok); }
     .dot.error { background: var(--danger); }
 
     .grid-main {
       display: grid;
-      grid-template-columns: 1.25fr 1fr;
-      gap: 18px;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 16px;
+      align-items: start;
     }
 
-    @media (max-width: 860px) {
+    @media (max-width: 920px) {
       .grid-main { grid-template-columns: 1fr; }
     }
 
@@ -104,17 +100,18 @@
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 18px;
+      padding: 16px;
     }
 
     .card h2 {
-      margin: 0 0 14px;
-      font-size: 1.08rem;
+      margin: 0 0 12px;
+      font-size: 1.05rem;
       border-bottom: 1px solid var(--border);
       padding-bottom: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 8px;
     }
 
     .camera-box {
@@ -155,26 +152,26 @@
     .camera-placeholder {
       color: var(--muted);
       text-align: center;
-      padding: 20px;
-      font-size: 0.95rem;
+      padding: 18px;
+      font-size: 0.92rem;
     }
 
-    .cam-controls, .action-buttons, .test-row {
+    .row-btns {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-top: 12px;
+      margin-top: 10px;
     }
 
     button, .file-label {
       border: none;
       border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 0.9rem;
+      padding: 9px 13px;
+      font-size: 0.88rem;
       font-weight: 700;
       cursor: pointer;
       color: #fff;
-      transition: transform 0.12s ease, opacity 0.15s ease;
+      transition: transform 0.1s ease, opacity 0.15s ease;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -192,97 +189,201 @@
       transform: none;
     }
 
-    .btn-cam { background: #0284c7; }
-    .btn-switch { background: #334155; }
-    .btn-reset { background: #991b1b; }
-    .btn-cat { background: var(--cat); color: #052e16; flex: 1; min-width: 115px; }
-    .btn-lion { background: var(--lion); color: #271500; flex: 1; min-width: 115px; }
-    .btn-other { background: var(--other); color: #fff; flex: 1; min-width: 115px; }
-    .btn-test { background: var(--test); flex: 1.4; padding: 12px; font-size: 0.98rem; }
+    .btn-primary { background: #0284c7; }
+    .btn-secondary { background: #334155; }
+    .btn-purple { background: var(--purple); }
+    .btn-ok { background: var(--ok); color: #052e16; }
+    .btn-danger { background: #991b1b; }
     .btn-live { background: #1e293b; border: 1px solid var(--border); flex: 1; }
     .btn-live.active { background: #0d9488; border-color: #14b8a6; }
+    .btn-voice { background: #1e293b; border: 1px solid var(--border); }
+    .btn-voice.active { background: #0369a1; border-color: var(--accent); }
 
     input[type="file"] { display: none; }
 
+    input[type="text"] {
+      background: var(--card-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 0.92rem;
+      flex: 1;
+      min-width: 150px;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+
     .result-box {
-      margin-top: 14px;
+      margin-top: 12px;
       background: var(--card-2);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 14px;
-      min-height: 125px;
+      min-height: 120px;
     }
 
     .prediction-title {
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       font-weight: 800;
       margin-bottom: 6px;
     }
 
     .prob-row {
       display: grid;
-      grid-template-columns: 75px 1fr 48px;
+      grid-template-columns: 110px 1fr 44px;
       align-items: center;
       gap: 8px;
-      margin: 6px 0;
-      font-size: 0.85rem;
+      margin: 5px 0;
+      font-size: 0.84rem;
+    }
+
+    .prob-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 700;
     }
 
     .meter-wrap {
       background: #1e293b;
       border-radius: 999px;
-      height: 10px;
+      height: 9px;
       overflow: hidden;
     }
 
     .meter-bar {
       height: 100%;
       width: 0%;
-      transition: width 0.22s ease;
       border-radius: 999px;
+      transition: width 0.2s ease;
     }
 
-    .hint-box {
-      margin-top: 10px;
-      padding-top: 8px;
-      border-top: 1px dashed var(--border);
-      font-size: 0.82rem;
-      color: var(--muted);
+    /* قسم الفئات والمجلدات */
+    .quick-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
     }
 
-    .samples-section {
-      margin-top: 14px;
-      display: grid;
-      gap: 10px;
-    }
-
-    .sample-group {
+    .chip {
       background: var(--card-2);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px;
+      color: var(--muted);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      cursor: pointer;
     }
 
-    .sample-group-header {
+    .chip:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .folder-box {
+      background: linear-gradient(135deg, rgba(2, 132, 199, 0.14), rgba(139, 92, 246, 0.12));
+      border: 1px dashed var(--accent);
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 12px;
+    }
+
+    .progress-wrap {
+      display: none;
+      margin-top: 10px;
+      background: var(--card-2);
+      border-radius: 8px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      font-size: 0.82rem;
+    }
+
+    .classes-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+      max-height: 430px;
+      overflow-y: auto;
+      padding-left: 2px;
+    }
+
+    .class-card {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+
+    .class-card.is-danger {
+      border-color: rgba(239, 68, 68, 0.5);
+    }
+
+    .class-header {
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.88rem;
-      font-weight: 700;
+      gap: 8px;
       margin-bottom: 8px;
     }
 
-    .thumbs-grid {
+    .class-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 0.98rem;
+    }
+
+    .badge-type {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    .badge-normal {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--ok);
+      border-color: rgba(34, 197, 94, 0.35);
+    }
+
+    .badge-danger {
+      background: rgba(239, 68, 68, 0.18);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.45);
+    }
+
+    .class-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
     }
 
+    .btn-xs {
+      padding: 5px 9px;
+      font-size: 0.78rem;
+      border-radius: 8px;
+    }
+
+    .thumbs-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 6px;
+    }
+
     .thumb-item {
       position: relative;
-      width: 44px;
-      height: 44px;
-      border-radius: 8px;
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
       overflow: hidden;
       border: 1px solid var(--border);
     }
@@ -296,39 +397,49 @@
 
     .thumb-del {
       position: absolute;
-      top: 1px;
-      left: 1px;
-      width: 16px;
-      height: 16px;
+      top: 0;
+      left: 0;
+      width: 15px;
+      height: 15px;
       padding: 0;
-      border-radius: 50%;
+      border-radius: 4px;
       background: rgba(15, 23, 42, 0.85);
       color: #fff;
-      font-size: 11px;
+      font-size: 10px;
       line-height: 1;
     }
 
+    .more-badge {
+      height: 40px;
+      padding: 0 8px;
+      border-radius: 6px;
+      background: #1e293b;
+      color: var(--muted);
+      font-size: 0.76rem;
+      display: inline-flex;
+      align-items: center;
+    }
+
     .setting-item {
-      margin-bottom: 14px;
       background: var(--card-2);
-      padding: 12px;
-      border-radius: 10px;
       border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-top: 10px;
     }
 
     .setting-header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      font-size: 0.86rem;
       font-weight: 700;
-      margin-bottom: 6px;
-      font-size: 0.9rem;
+      margin-bottom: 4px;
     }
 
     .setting-desc {
-      font-size: 0.8rem;
+      font-size: 0.77rem;
       color: var(--muted);
-      margin-top: 5px;
+      margin-top: 4px;
     }
 
     input[type="range"], select {
@@ -341,33 +452,18 @@
       color: var(--text);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 8px 10px;
-      font-size: 0.88rem;
-    }
-
-    .switch-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.9rem;
-      font-weight: 700;
-    }
-
-    .io-buttons {
-      display: flex;
-      gap: 8px;
-      margin-top: 10px;
+      padding: 7px;
+      font-size: 0.85rem;
     }
 
     .log {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--muted);
-      margin-top: 12px;
-      max-height: 110px;
+      margin-top: 10px;
+      max-height: 95px;
       overflow-y: auto;
       background: var(--card-2);
-      padding: 10px;
+      padding: 8px 10px;
       border-radius: 10px;
       border: 1px solid var(--border);
     }
@@ -377,21 +473,21 @@
   <div class="container">
     <header>
       <div>
-        <h1>🐱🦁 مصنف الرؤية الذكي: قطة أم أسد</h1>
-        <p>يعتمد على شبكة <strong>MobileNet v2</strong> لاستخراج الميزات الدلالية مع كاشف تلقائي للأجسام الغريبة (مثل الطفاية أو الأكواب).</p>
+        <h1>🦯 مدرب ومساعد الرؤية الذكي لفاقدي البصر</h1>
+        <p>أنشئ أي فئة بالاسم (أبواب، حفر، نار، سلالم صاعدة...) أو ارفع مجلدات كاملة لتدريب نموذج خفيف وسريع مع نطق عربي فوري.</p>
       </div>
-      <div id="modelStatus" class="status-badge">
+      <div class="status-badge">
         <span id="statusDot" class="dot"></span>
         <span id="statusText">جاري تحميل MobileNet v2...</span>
       </div>
     </header>
 
     <div class="grid-main">
-      <!-- العمود الأيمن: الكاميرا والتدريب والاختبار -->
+      <!-- العمود الأول: الكاميرا، الاختبار، والمساعد الصوتي -->
       <div class="card">
         <h2>
-          <span>1. الكاميرا والتدريب والاختبار</span>
-          <button id="backToCamBtn" class="btn-switch" style="padding:5px 10px; font-size:0.78rem; display:none;">📹 العودة للكاميرا</button>
+          <span>1. الكاميرا والاختبار والمساعد الصوتي</span>
+          <button id="backToCamBtn" class="btn-secondary btn-xs" style="display:none;">📹 العودة للكاميرا</button>
         </h2>
 
         <div class="camera-box">
@@ -401,155 +497,170 @@
             <div class="crop-square"></div>
           </div>
           <div id="placeholder" class="camera-placeholder">
-            اضغط على <strong>تشغيل الكاميرا</strong> أو <strong>رفع صورة</strong> للبدء.<br/>
-            <span style="font-size:0.82rem;">المربع المتقطع يوضح منطقة التركيز التي يراها النموذج بدقة 224×224.</span>
+            اضغط <strong>تشغيل الكاميرا</strong> أو <strong>رفع صورة للاختبار</strong>.<br/>
+            <span style="font-size:0.8rem;">عند تشغيل المساعد الصوتي والوضع المباشر، ينطق النظام أي عائق أو باب أو خطر يظهر أمام الكاميرا.</span>
           </div>
         </div>
 
-        <div class="cam-controls">
-          <button id="startCamBtn" class="btn-cam">📷 تشغيل الكاميرا</button>
-          <button id="switchCamBtn" class="btn-switch" disabled>🔄 تبديل الكاميرا</button>
-          <label class="file-label btn-switch">
-            🖼️ رفع صورة
-            <input type="file" id="imageUpload" accept="image/*" />
+        <div class="row-btns">
+          <button id="startCamBtn" class="btn-primary">📷 تشغيل الكاميرا</button>
+          <button id="switchCamBtn" class="btn-secondary" disabled>🔄 تبديل الكاميرا</button>
+          <label class="file-label btn-secondary">
+            🖼️ اختبار صورة من الجهاز
+            <input type="file" id="testImageUpload" accept="image/*" />
           </label>
-          <button id="resetBtn" class="btn-reset">🗑️ تصفير</button>
+          <button id="voiceBtn" class="btn-voice active">🔊 الصوت: مفعّل</button>
         </div>
 
-        <div class="action-buttons">
-          <button id="trainCatBtn" class="btn-cat" disabled>🐱 تعليم: قطة</button>
-          <button id="trainLionBtn" class="btn-lion" disabled>🦁 تعليم: أسد</button>
-          <button id="trainOtherBtn" class="btn-other" disabled>🚫 أخرى (اختياري)</button>
+        <div class="row-btns">
+          <button id="testBtn" class="btn-purple" style="flex:1.2;" disabled>🔍 اختبار لقطة واحدة</button>
+          <button id="liveBtn" class="btn-live" disabled>⚡ المساعد المباشر: متوقف</button>
         </div>
 
-        <div class="test-row">
-          <button id="testBtn" class="btn-test" disabled>🔍 اختبار الصورة الحالية</button>
-          <button id="liveBtn" class="btn-live" disabled>⚡ اختبار مباشر: متوقف</button>
-        </div>
-
-        <div id="resultBox" class="result-box">
-          <div class="prediction-title">بانتظار جاهزية النموذج والتدريب...</div>
-          <div style="color: var(--muted); font-size: 0.88rem;">
-            درّب النموذج على <strong>4 إلى 10 صور</strong> واضحة لكل من «قطة» و«أسد»، ثم اختبره على قطة أو أسد أو حتى جسم غريب للتأكد من رفضه.
+        <div id="resultBox" class="result-box" aria-live="polite">
+          <div class="prediction-title">بانتظار جاهزية المحرك والفئات...</div>
+          <div style="color: var(--muted); font-size: 0.86rem;">
+            أضف فئاتك من القسم المقابل (أو استورد مجلدات الفئات دفعة واحدة)، ثم جرّب الاختبار الفردي أو المباشر.
           </div>
         </div>
 
-        <!-- عرض مصغرات عينات التدريب مع إمكانية الحذف الفردي -->
-        <div class="samples-section">
-          <div class="sample-group">
-            <div class="sample-group-header">
-              <span style="color:var(--cat);">🐱 عينات القطة (<span id="catCount">0</span>)</span>
-              <span style="color:var(--muted); font-weight:400; font-size:0.78rem;">اضغط × لحذف لقطة</span>
-            </div>
-            <div id="catThumbs" class="thumbs-grid"></div>
-          </div>
-
-          <div class="sample-group">
-            <div class="sample-group-header">
-              <span style="color:var(--lion);">🦁 عينات الأسد (<span id="lionCount">0</span>)</span>
-              <span style="color:var(--muted); font-weight:400; font-size:0.78rem;">اضغط × لحذف لقطة</span>
-            </div>
-            <div id="lionThumbs" class="thumbs-grid"></div>
-          </div>
-
-          <div id="otherGroup" class="sample-group" style="display:none;">
-            <div class="sample-group-header">
-              <span style="color:#cbd5e1;">🚫 عينات أخرى / خلفية (<span id="otherCount">0</span>)</span>
-              <span style="color:var(--muted); font-weight:400; font-size:0.78rem;">فئة سلبية مساعدة</span>
-            </div>
-            <div id="otherThumbs" class="thumbs-grid"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- العمود الأيسر: الإعدادات الاحترافية والسجل -->
-      <div class="card">
-        <h2>2. إعدادات الدقة وكشف الأجسام الغريبة</h2>
-
+        <!-- إعدادات الدقة والحفظ -->
         <div class="setting-item">
           <div class="setting-header">
-            <span>حد رفض الأجسام الغريبة (OOD Threshold)</span>
-            <span id="oodVal">58%</span>
+            <span>حد رفض الأجسام غير المعروفة (منع التخمين العشوائي)</span>
+            <span id="oodVal">56%</span>
           </div>
-          <input type="range" id="oodRange" min="40" max="80" value="58" />
+          <input type="range" id="oodRange" min="35" max="80" value="56" />
           <div class="setting-desc">
-            أهم إعداد لمنع التصنيف الخاطئ لطفاية السجائر أو الأشياء غير المتعلقة: إذا كان أقصى تشابه دلالي مع صورك أقل من هذا الحد، يرفض النموذج التخمين. (55%–62% مثالي للصور الحقيقية).
+            إذا لم يشبه المشهد أي فئة مدرَّبة بهذه النسبة، يظل صامتاً ويعرض «طريق خالٍ / جسم غير معروف».
           </div>
         </div>
 
         <div class="setting-item">
           <div class="setting-header">
-            <span>حد الثقة المطلوب للقرار</span>
-            <span id="confVal">65%</span>
+            <span>حد الثقة المطلوب للنطق والقرار</span>
+            <span id="confVal">62%</span>
           </div>
-          <input type="range" id="confRange" min="52" max="92" value="65" />
-          <div class="setting-desc">
-            الفارق المطلوب للجزم بين «قطة» و«أسد» عند تقارب الملامح (مثلاً شبل أسد أو قطة برتقالية).
-          </div>
+          <input type="range" id="confRange" min="45" max="90" value="62" />
         </div>
 
-        <div class="setting-item">
-          <div class="setting-header">
-            <span>أسلوب التصنيف والدمج</span>
-            <span id="modeLabel">متوازن</span>
-          </div>
-          <select id="modeSelect">
-            <option value="0.5" selected>متوازن — دمج المصنف الخطي + أقرب الأمثلة (موصى به)</option>
-            <option value="0.8">صارم — الاعتماد الأكبر على أقرب صور التدريب مباشرة</option>
-            <option value="0.25">مرن — تعميم أوسع للزوايا والإضاءة المختلفة</option>
-          </select>
-        </div>
-
-        <div class="setting-item">
-          <label class="switch-row">
-            <span>مضاعفة البيانات بعكس الصورة أفقياً</span>
-            <input type="checkbox" id="augmentCheck" checked style="width:18px; height:18px;" />
+        <div class="row-btns" style="margin-top:10px;">
+          <button id="exportBtn" class="btn-secondary" style="flex:1;">💾 تصدير النموذج (JSON)</button>
+          <label class="file-label btn-secondary" style="flex:1;">
+            📂 استيراد نموذج (JSON)
+            <input type="file" id="importModelInput" accept="application/json" />
           </label>
-          <div class="setting-desc">
-            يُنشئ تلقائياً نسخة معكوسة لكل صورة تدريبية حتى يتعرف النموذج على القطة والأسد من اليمين واليسار بنفس الكفاءة.
-          </div>
-        </div>
-
-        <div class="setting-item">
-          <label class="switch-row">
-            <span>إظهار تلميح MobileNet العام (تشخيصي)</span>
-            <input type="checkbox" id="hintCheck" checked style="width:18px; height:18px;" />
-          </label>
-          <div class="setting-desc">
-            يعرض اسم الكائن الذي تراه الشبكة الأساسية (مثل: tabby cat, lion, ashtray) أسفل النتيجة لمساعدتك في التحقق.
-          </div>
-        </div>
-
-        <div class="setting-item">
-          <div class="setting-header" style="margin-bottom:4px;">
-            <span>حفظ ومشاركة النموذج المدرَّب</span>
-          </div>
-          <div class="setting-desc" style="margin-top:0;">
-            يتم حفظ العينات تلقائياً في المتصفح. يمكنك أيضاً تصديرها كملف أو استيرادها لاحقاً:
-          </div>
-          <div class="io-buttons">
-            <button id="exportBtn" class="btn-switch" style="flex:1; font-size:0.82rem;">💾 تصدير JSON</button>
-            <label class="file-label btn-switch" style="flex:1; font-size:0.82rem;">
-              📂 استيراد JSON
-              <input type="file" id="importInput" accept="application/json" />
-            </label>
-          </div>
+          <button id="resetAllBtn" class="btn-danger">🗑️ تصفير الكل</button>
         </div>
 
         <div id="logBox" class="log">سجل العمليات جاهز.</div>
       </div>
+
+      <!-- العمود الثاني: إنشاء الفئات واستيراد المجلدات -->
+      <div class="card">
+        <h2>
+          <span>2. الفئات والتدريب بالمجلدات أو الكاميرا</span>
+          <span id="totalSamplesBadge" style="font-size:0.8rem; color:var(--accent);">0 صورة</span>
+        </h2>
+
+        <!-- إضافة فئة يدوياً -->
+        <div class="row-btns" style="margin-top:0;">
+          <input type="text" id="newClassInput" placeholder="اكتب اسم الفئة (مثل: باب، حفرة، نار، سلالم صاعدة)..." />
+          <button id="addClassBtn" class="btn-ok">➕ إضافة فئة</button>
+        </div>
+
+        <div class="quick-chips">
+          <span style="font-size:0.78rem; color:var(--muted); align-self:center;">إضافة سريعة:</span>
+          <span class="chip" data-name="باب">+ باب</span>
+          <span class="chip" data-name="سلالم صاعدة">+ سلالم صاعدة</span>
+          <span class="chip" data-name="سلالم هابطة">+ سلالم هابطة</span>
+          <span class="chip" data-name="حفرة">+ حفرة</span>
+          <span class="chip" data-name="نار">+ نار</span>
+          <span class="chip" data-name="عائق">+ عائق</span>
+        </div>
+
+        <!-- استيراد مجلدات دفعة واحدة -->
+        <div class="folder-box">
+          <div style="font-weight:700; font-size:0.9rem; margin-bottom:4px;">📁 تدريب سريع من مجلدات جاهزة</div>
+          <div style="font-size:0.79rem; color:var(--muted); margin-bottom:8px;">
+            ضع صور كل فئة داخل مجلد باسمها (مثلاً: <code>dataset/باب/</code> و<code>dataset/حفرة/</code> و<code>dataset/نار/</code>)، ثم اختر المجلد الرئيسي هنا ليتم إنشاء الفئات وتدريبها تلقائياً:
+          </div>
+          <div class="row-btns" style="margin-top:0;">
+            <label id="folderImportLabel" class="file-label btn-primary" style="flex:1;">
+              📂 اختيار مجلد الفئات الرئيسي للتدريب
+              <input type="file" id="folderInput" webkitdirectory directory multiple accept="image/*" />
+            </label>
+            <button id="cancelImportBtn" class="btn-danger" style="display:none;">⏹️ إيقاف</button>
+          </div>
+          <div id="progressWrap" class="progress-wrap">
+            <div id="progressText" style="margin-bottom:5px;">جاري المعالجة...</div>
+            <div class="meter-wrap">
+              <div id="progressBar" class="meter-bar" style="background:var(--accent); width:0%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- قائمة الفئات -->
+        <div id="classesList" class="classes-list"></div>
+      </div>
     </div>
   </div>
 
-  <!-- كانفاس معالجة مخفي بمقاس إدخال MobileNet القياسي -->
+  <!-- كانفاس مخفي للمعالجة -->
   <canvas id="cropCanvas" width="224" height="224" style="display:none;"></canvas>
   <canvas id="flipCanvas" width="224" height="224" style="display:none;"></canvas>
-  <canvas id="thumbCanvas" width="64" height="64" style="display:none;"></canvas>
+  <canvas id="thumbCanvas" width="48" height="48" style="display:none;"></canvas>
 
   <script>
-    const STORAGE_KEY = "cat_lion_mobilenet_v2_samples_v1";
+    // =========================================================
+    // 1. قاعدة بيانات IndexedDB لتخزين مئات الصور محلياً بدون قيود 5MB
+    // =========================================================
+    const DB_NAME = "BlindAssistVisionDB_v1";
+    const STORE_NAME = "state";
 
-    // عناصر الواجهة
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME);
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function dbSave(payload) {
+      try {
+        const db = await openDB();
+        return await new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_NAME, "readwrite");
+          tx.objectStore(STORE_NAME).put(payload, "appData");
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error);
+        });
+      } catch (e) {
+        console.warn("IndexedDB Save Error:", e);
+      }
+    }
+
+    async function dbLoad() {
+      try {
+        const db = await openDB();
+        return await new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_NAME, "readonly");
+          const req = tx.objectStore(STORE_NAME).get("appData");
+          req.onsuccess = () => resolve(req.result || null);
+          req.onerror = () => reject(req.error);
+        });
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // =========================================================
+    // 2. المتغيرات والعناصر
+    // =========================================================
     const video = document.getElementById("video");
     const snapshotCanvas = document.getElementById("snapshotCanvas");
     const placeholder = document.getElementById("placeholder");
@@ -564,90 +675,181 @@
     const startCamBtn = document.getElementById("startCamBtn");
     const switchCamBtn = document.getElementById("switchCamBtn");
     const backToCamBtn = document.getElementById("backToCamBtn");
-    const imageUpload = document.getElementById("imageUpload");
-    const resetBtn = document.getElementById("resetBtn");
-
-    const trainCatBtn = document.getElementById("trainCatBtn");
-    const trainLionBtn = document.getElementById("trainLionBtn");
-    const trainOtherBtn = document.getElementById("trainOtherBtn");
+    const testImageUpload = document.getElementById("testImageUpload");
+    const voiceBtn = document.getElementById("voiceBtn");
     const testBtn = document.getElementById("testBtn");
     const liveBtn = document.getElementById("liveBtn");
-
-    const catCountEl = document.getElementById("catCount");
-    const lionCountEl = document.getElementById("lionCount");
-    const otherCountEl = document.getElementById("otherCount");
-    const otherGroupEl = document.getElementById("otherGroup");
-    const catThumbsEl = document.getElementById("catThumbs");
-    const lionThumbsEl = document.getElementById("lionThumbs");
-    const otherThumbsEl = document.getElementById("otherThumbs");
-
-    const resultBox = document.getElementById("resultBox");
-    const logBox = document.getElementById("logBox");
 
     const oodRange = document.getElementById("oodRange");
     const oodVal = document.getElementById("oodVal");
     const confRange = document.getElementById("confRange");
     const confVal = document.getElementById("confVal");
-    const modeSelect = document.getElementById("modeSelect");
-    const modeLabel = document.getElementById("modeLabel");
-    const augmentCheck = document.getElementById("augmentCheck");
-    const hintCheck = document.getElementById("hintCheck");
-    const exportBtn = document.getElementById("exportBtn");
-    const importInput = document.getElementById("importInput");
 
-    // حالة التطبيق والنموذج
+    const newClassInput = document.getElementById("newClassInput");
+    const addClassBtn = document.getElementById("addClassBtn");
+    const folderInput = document.getElementById("folderInput");
+    const cancelImportBtn = document.getElementById("cancelImportBtn");
+    const progressWrap = document.getElementById("progressWrap");
+    const progressText = document.getElementById("progressText");
+    const progressBar = document.getElementById("progressBar");
+    const classesListEl = document.getElementById("classesList");
+    const totalSamplesBadge = document.getElementById("totalSamplesBadge");
+
+    const exportBtn = document.getElementById("exportBtn");
+    const importModelInput = document.getElementById("importModelInput");
+    const resetAllBtn = document.getElementById("resetAllBtn");
+    const resultBox = document.getElementById("resultBox");
+    const logBox = document.getElementById("logBox");
+
     let mobilenetModel = null;
     let stream = null;
     let facingMode = "environment";
     let hasUploadedSource = false;
+
     let isLiveMode = false;
     let liveTimer = null;
     let isBusy = false;
+    let cancelBatchFlag = false;
+
+    // الصوت والتنبيهات
+    let voiceEnabled = true;
+    let audioCtx = null;
+    let arVoice = null;
+    let lastSpokenClass = "";
+    let lastSpokenTime = 0;
+    let stableCandidate = "";
+    let stableCount = 0;
 
     /**
-     * كل عينة:
-     * { id: string, label: 'cat'|'lion'|'other', vec: number[], flipVec: number[]|null, thumb: string }
+     * classes: Array<{ id: string, name: string, isDanger: boolean }>
+     * samples: Array<{ id: string, classId: string, vec: number[], flipVec: number[]|null, thumb: string }>
      */
+    let classes = [];
     let samples = [];
-
-    // أوزان المصنف الخطي (L2-Regularized Balanced Softmax)
-    let linearHead = null; // { classes: string[], W: Float32Array[], b: Float32Array }
+    let linearHead = null; // { activeClasses: ClassObj[], W: Float32Array[], b: Float32Array }
 
     function log(msg) {
       const time = new Date().toLocaleTimeString("ar-EG");
       logBox.innerHTML = `<div>[${time}] ${msg}</div>` + logBox.innerHTML;
     }
 
-    // --- تحميل MobileNet v2 ---
+    function isLikelyDanger(name) {
+      return /نار|حريق|حفر|مطب|كهرب|خطر|هابط|سيار|شارع|عائق|زجاج|ماء|بركة|مكسور|fire|hole|danger|stairs/i.test(name);
+    }
+
+    function roundVec(arr) {
+      const out = new Array(arr.length);
+      for (let i = 0; i < arr.length; i++) out[i] = Math.round(arr[i] * 10000) / 10000;
+      return out;
+    }
+
+    // =========================================================
+    // 3. تهيئة الصوت والتنبيه التحذيري العربي
+    // =========================================================
+    function loadVoices() {
+      if (!("speechSynthesis" in window)) return;
+      const voices = window.speechSynthesis.getVoices();
+      arVoice = voices.find(v => v.lang.startsWith("ar-EG")) ||
+                voices.find(v => v.lang.startsWith("ar")) || null;
+    }
+    if ("speechSynthesis" in window) {
+      loadVoices();
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) audioCtx = new AC();
+      }
+      if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+    }
+
+    function playDangerBeep() {
+      try {
+        initAudio();
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+        [880, 1100].forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+          gain.gain.setValueAtTime(0.18, now + idx * 0.12);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.1);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + idx * 0.12);
+          osc.stop(now + idx * 0.12 + 0.11);
+        });
+      } catch (e) {}
+    }
+
+    function speakArabic(text, isDanger = false) {
+      if (!voiceEnabled || !("speechSynthesis" in window)) return;
+      if (isDanger) playDangerBeep();
+
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = arVoice ? arVoice.lang : "ar-SA";
+      if (arVoice) u.voice = arVoice;
+      u.rate = isDanger ? 1.08 : 1.0;
+      u.pitch = isDanger ? 1.1 : 1.0;
+      setTimeout(() => window.speechSynthesis.speak(u), isDanger ? 180 : 0);
+    }
+
+    voiceBtn.addEventListener("click", () => {
+      initAudio();
+      voiceEnabled = !voiceEnabled;
+      voiceBtn.classList.toggle("active", voiceEnabled);
+      voiceBtn.textContent = voiceEnabled ? "🔊 الصوت: مفعّل" : "🔇 الصوت: صامت";
+      if (!voiceEnabled && "speechSynthesis" in window) window.speechSynthesis.cancel();
+    });
+
+    // =========================================================
+    // 4. تحميل MobileNet v2
+    // =========================================================
     async function initMobileNet() {
       try {
         statusDot.className = "dot";
         statusText.textContent = "جاري تحميل MobileNet v2...";
         mobilenetModel = await mobilenet.load({ version: 2, alpha: 1.0 });
 
-        // تسخين النموذج (Warmup) لتسريع أول اختبار فعلي
-        const warmCtx = cropCanvas.getContext("2d");
-        warmCtx.fillStyle = "#000";
-        warmCtx.fillRect(0, 0, 224, 224);
-        const warmTensor = mobilenetModel.infer(cropCanvas, true);
-        await warmTensor.data();
-        warmTensor.dispose();
+        const ctx = cropCanvas.getContext("2d");
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, 224, 224);
+        const t = mobilenetModel.infer(cropCanvas, true);
+        await t.data();
+        t.dispose();
 
         statusDot.className = "dot ready";
-        statusText.textContent = "MobileNet v2 جاهز";
-        [trainCatBtn, trainLionBtn, trainOtherBtn, testBtn, liveBtn].forEach(b => b.disabled = false);
-        log("تم تحميل نموذج MobileNet v2 (1280 ميزة دلالية) بنجاح.");
+        statusText.textContent = "جاهز للتدريب والتشغيل";
+        testBtn.disabled = false;
+        liveBtn.disabled = false;
+        log("تم تحميل MobileNet v2 بنجاح.");
 
-        loadFromStorage();
+        const saved = await dbLoad();
+        if (saved && Array.isArray(saved.classes)) {
+          classes = saved.classes;
+          samples = saved.samples || [];
+          retrainLinearHead();
+          renderClassesUI();
+          log(`تمت استعادة ${classes.length} فئات و ${samples.length} صورة من الذاكرة المحلية.`);
+        } else {
+          renderClassesUI();
+        }
       } catch (err) {
         statusDot.className = "dot error";
-        statusText.textContent = "فشل تحميل النموذج";
-        log(`خطأ في تحميل MobileNet: ${err.message}. تأكد من الاتصال بالإنترنت.`);
+        statusText.textContent = "تعذر تحميل النموذج";
+        log(`خطأ في التحميل: ${err.message}`);
       }
     }
 
-    // --- إدارة الكاميرا والصور ---
+    // =========================================================
+    // 5. الكاميرا واستخراج الميزات
+    // =========================================================
     async function startCamera() {
+      initAudio();
       try {
         if (stream) stream.getTracks().forEach(t => t.stop());
         stream = await navigator.mediaDevices.getUserMedia({
@@ -657,10 +859,9 @@
         video.srcObject = stream;
         showCameraView();
         switchCamBtn.disabled = false;
-        log("تم تشغيل الكاميرا بنجاح.");
+        log("تم تشغيل الكاميرا.");
       } catch (err) {
-        log(`تعذر فتح الكاميرا (${err.message}).`);
-        alert("تعذر الوصول إلى الكاميرا. تأكد من الصلاحية أو استخدم زر «رفع صورة».");
+        alert("تعذر فتح الكاميرا. تأكد من الصلاحية أو استخدم رفع صورة.");
       }
     }
 
@@ -674,21 +875,13 @@
     }
 
     startCamBtn.addEventListener("click", startCamera);
-
     switchCamBtn.addEventListener("click", () => {
       facingMode = facingMode === "environment" ? "user" : "environment";
       startCamera();
     });
+    backToCamBtn.addEventListener("click", () => (stream ? showCameraView() : startCamera()));
 
-    backToCamBtn.addEventListener("click", () => {
-      if (stream) {
-        showCameraView();
-      } else {
-        startCamera();
-      }
-    });
-
-    imageUpload.addEventListener("change", (e) => {
+    testImageUpload.addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (!file) return;
       stopLiveMode();
@@ -705,12 +898,13 @@
           cropGuide.style.display = "flex";
           hasUploadedSource = true;
           if (stream) backToCamBtn.style.display = "inline-flex";
-          log(`تم تحميل الصورة: ${file.name}`);
+          log(`تم تحميل صورة الاختبار: ${file.name}`);
+          testCurrentFrame(false);
         };
         img.src = ev.target.result;
       };
       reader.readAsDataURL(file);
-      imageUpload.value = "";
+      testImageUpload.value = "";
     });
 
     function getActiveVisualSource() {
@@ -719,22 +913,19 @@
       return null;
     }
 
-    // قص مربع مركزي بمقاس 224×224 لمنع مطّ الصورة وتوحيد الأبعاد
-    function drawCenterCropTo224(source) {
+    function drawCenterCropTo224(source, makeThumb = true) {
       const sw = source instanceof HTMLVideoElement ? source.videoWidth : source.width;
       const sh = source instanceof HTMLVideoElement ? source.videoHeight : source.height;
       const side = Math.min(sw, sh);
       const sx = (sw - side) / 2;
       const sy = (sh - side) / 2;
-      const ctx = cropCanvas.getContext("2d");
-      ctx.drawImage(source, sx, sy, side, side, 0, 0, 224, 224);
+      cropCanvas.getContext("2d").drawImage(source, sx, sy, side, side, 0, 0, 224, 224);
 
-      const tctx = thumbCanvas.getContext("2d");
-      tctx.drawImage(cropCanvas, 0, 0, 64, 64);
-      return thumbCanvas.toDataURL("image/jpeg", 0.72);
+      if (!makeThumb) return "";
+      thumbCanvas.getContext("2d").drawImage(cropCanvas, 0, 0, 48, 48);
+      return thumbCanvas.toDataURL("image/jpeg", 0.65);
     }
 
-    // استخراج متجه MobileNet وتطبيعه بـ L2
     async function extractEmbedding(canvasEl) {
       const tensor = mobilenetModel.infer(canvasEl, true);
       try {
@@ -743,7 +934,7 @@
         for (let i = 0; i < raw.length; i++) normSq += raw[i] * raw[i];
         const norm = Math.sqrt(normSq) || 1;
         const vec = new Array(raw.length);
-        for (let i = 0; i < raw.length; i++) vec[i] = raw[i] / norm;
+        for (let i = 0; i < raw.length; i++) vec[i] = Math.round((raw[i] / norm) * 10000) / 10000;
         return vec;
       } finally {
         tensor.dispose();
@@ -760,53 +951,52 @@
       return extractEmbedding(flipCanvas);
     }
 
-    // --- خوارزميات الرياضيات والتصنيف ---
+    // =========================================================
+    // 6. محرك التصنيف متعدد الفئات (Balanced L2-Softmax + Top-K KNN + OOD)
+    // =========================================================
     function dot(a, b) {
       let s = 0;
       for (let i = 0; i < a.length; i++) s += a[i] * b[i];
       return s;
     }
 
-    function softmax(logits) {
+    function softmaxInto(logits, out) {
       let max = -Infinity;
       for (let i = 0; i < logits.length; i++) if (logits[i] > max) max = logits[i];
-      const exps = new Array(logits.length);
       let sum = 0;
       for (let i = 0; i < logits.length; i++) {
-        exps[i] = Math.exp(logits[i] - max);
-        sum += exps[i];
+        out[i] = Math.exp(logits[i] - max);
+        sum += out[i];
       }
-      for (let i = 0; i < logits.length; i++) exps[i] /= sum;
-      return exps;
+      for (let i = 0; i < logits.length; i++) out[i] /= sum;
     }
 
-    // إعادة تدريب الرأس الخطي على جميع العينات بموازنة الفئات + تنظيم L2
     function retrainLinearHead() {
-      const counts = { cat: 0, lion: 0, other: 0 };
-      samples.forEach(s => counts[s.label]++);
+      const countByClass = {};
+      for (const c of classes) countByClass[c.id] = 0;
+      for (const s of samples) {
+        if (countByClass[s.classId] !== undefined) countByClass[s.classId]++;
+      }
 
-      if (counts.cat === 0 || counts.lion === 0) {
-        linearHead = null;
+      const activeClasses = classes.filter(c => countByClass[c.id] > 0);
+      if (activeClasses.length < 2) {
+        linearHead = activeClasses.length === 1 ? { activeClasses, W: null, b: null } : null;
         return;
       }
 
-      const classes = counts.other > 0 ? ["cat", "lion", "other"] : ["cat", "lion"];
-      const C = classes.length;
-      const useAug = augmentCheck.checked;
+      const C = activeClasses.length;
+      const idToIdx = {};
+      activeClasses.forEach((c, idx) => idToIdx[c.id] = idx);
 
-      // تجميع أزواج التدريب مع أوزان عكسية لتعويض تفاوت عدد الصور بين الفئات
       const trainItems = [];
       for (const s of samples) {
-        const cIdx = classes.indexOf(s.label);
-        if (cIdx === -1) continue;
-        const w = 1 / (C * counts[s.label]);
-        trainItems.push({ cIdx, vec: s.vec, weight: w });
-        if (useAug && s.flipVec) {
-          trainItems.push({ cIdx, vec: s.flipVec, weight: w });
-        }
+        const idx = idToIdx[s.classId];
+        if (idx === undefined) continue;
+        const w = 1 / (C * countByClass[s.classId]);
+        trainItems.push({ idx, vec: s.vec, weight: w });
+        if (s.flipVec) trainItems.push({ idx, vec: s.flipVec, weight: w });
       }
 
-      // تطبيع أوزان العينات بحيث يكون المجموع = 1
       let totalW = 0;
       for (const it of trainItems) totalW += it.weight;
       for (const it of trainItems) it.weight /= totalW;
@@ -814,421 +1004,562 @@
       const D = trainItems[0].vec.length;
       const W = Array.from({ length: C }, () => new Float32Array(D));
       const b = new Float32Array(C);
-
-      const epochs = 85;
-      const lr = 1.2;
-      const reg = 0.004;
-
       const gradW = Array.from({ length: C }, () => new Float32Array(D));
       const gradB = new Float32Array(C);
+      const logits = new Float64Array(C);
+      const probs = new Float64Array(C);
+
+      const epochs = trainItems.length > 200 ? 40 : 75;
+      const lr = 1.25;
+      const reg = 0.004;
 
       for (let ep = 0; ep < epochs; ep++) {
         for (let c = 0; c < C; c++) {
           gradW[c].fill(0);
           gradB[c] = 0;
         }
-
         for (let n = 0; n < trainItems.length; n++) {
           const item = trainItems[n];
           const x = item.vec;
-          const logits = new Array(C);
           for (let c = 0; c < C; c++) logits[c] = b[c] + dot(W[c], x);
-          const probs = softmax(logits);
+          softmaxInto(logits, probs);
 
           for (let c = 0; c < C; c++) {
-            const diff = (probs[c] - (c === item.cIdx ? 1 : 0)) * item.weight;
+            const diff = (probs[c] - (c === item.idx ? 1 : 0)) * item.weight;
             gradB[c] += diff;
-            for (let j = 0; j < D; j++) gradW[c][j] += diff * x[j];
+            const gW = gradW[c];
+            for (let j = 0; j < D; j++) gW[j] += diff * x[j];
           }
         }
-
         for (let c = 0; c < C; c++) {
           b[c] -= lr * gradB[c];
-          for (let j = 0; j < D; j++) {
-            W[c][j] -= lr * (gradW[c][j] + reg * W[c][j]);
-          }
+          const wc = W[c];
+          const gwc = gradW[c];
+          for (let j = 0; j < D; j++) wc[j] -= lr * (gwc[j] + reg * wc[j]);
         }
       }
 
-      linearHead = { classes, W, b };
+      linearHead = { activeClasses, W, b };
     }
 
-    // --- عرض المصغرات والحفظ ---
-    function renderSamplesUI() {
-      const map = { cat: catThumbsEl, lion: lionThumbsEl, other: otherThumbsEl };
-      Object.values(map).forEach(el => el.innerHTML = "");
+    // =========================================================
+    // 7. إدارة الفئات والواجهة وإدخال الصور/المجلدات
+    // =========================================================
+    function ensureClass(name) {
+      const clean = name.trim();
+      if (!clean) return null;
+      let existing = classes.find(c => c.name === clean);
+      if (existing) return existing;
 
-      let cCat = 0, cLion = 0, cOther = 0;
-      for (const s of samples) {
-        if (s.label === "cat") cCat++;
-        else if (s.label === "lion") cLion++;
-        else cOther++;
+      const newObj = {
+        id: `cls_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        name: clean,
+        isDanger: isLikelyDanger(clean)
+      };
+      classes.push(newObj);
+      return newObj;
+    }
 
-        const div = document.createElement("div");
-        div.className = "thumb-item";
-        div.innerHTML = `
-          <img src="${s.thumb}" alt="${s.label}" />
-          <button class="thumb-del" title="حذف هذه اللقطة">×</button>
+    function persistAll() {
+      dbSave({ classes, samples });
+    }
+
+    function renderClassesUI() {
+      totalSamplesBadge.textContent = `${samples.length} صورة إجمالاً`;
+      classesListEl.innerHTML = "";
+
+      if (classes.length === 0) {
+        classesListEl.innerHTML = `
+          <div style="text-align:center; color:var(--muted); padding:18px; font-size:0.86rem; background:var(--card-2); border-radius:10px;">
+            لا توجد فئات بعد. اكتب اسم فئة بالأعلى أو اختر مجلد فئات للتدريب التلقائي.
+          </div>
         `;
-        div.querySelector(".thumb-del").addEventListener("click", () => {
-          samples = samples.filter(item => item.id !== s.id);
-          retrainLinearHead();
-          renderSamplesUI();
-          saveToStorage();
-          log("تم حذف عينة تدريب واحدة وإعادة ضبط الأوزان.");
-        });
-        map[s.label].appendChild(div);
-      }
-
-      catCountEl.textContent = cCat;
-      lionCountEl.textContent = cLion;
-      otherCountEl.textContent = cOther;
-      otherGroupEl.style.display = cOther > 0 ? "block" : "none";
-    }
-
-    function saveToStorage() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(samples));
-      } catch (e) {
-        log("تنبيه: مساحة التخزين المحلي ممتلئة، لن يتم حفظ المزيد تلقائياً.");
-      }
-    }
-
-    function loadFromStorage() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return;
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          samples = parsed;
-          retrainLinearHead();
-          renderSamplesUI();
-          log(`تمت استعادة ${samples.length} عينة تدريب محفوظة سابقاً.`);
-        }
-      } catch (e) { /* تجاهل */ }
-    }
-
-    // --- التدريب ---
-    async function trainSample(label) {
-      if (!mobilenetModel || isBusy) return;
-      const source = getActiveVisualSource();
-      if (!source) {
-        alert("يرجى تشغيل الكاميرا أولاً أو رفع صورة.");
         return;
       }
 
+      for (const cls of classes) {
+        const clsSamples = samples.filter(s => s.classId === cls.id);
+        const card = document.createElement("div");
+        card.className = `class-card ${cls.isDanger ? "is-danger" : ""}`;
+
+        card.innerHTML = `
+          <div class="class-header">
+            <div class="class-title-wrap">
+              <span>${cls.isDanger ? "⚠️" : "🏷️"} ${cls.name}</span>
+              <span style="font-size:0.78rem; color:var(--muted);">(${clsSamples.length})</span>
+              <span class="badge-type ${cls.isDanger ? "badge-danger" : "badge-normal"}" title="اضغط للتبديل بين عادي وخطر">
+                ${cls.isDanger ? "خطر / تحذير" : "عادي"}
+              </span>
+            </div>
+            <div class="class-actions">
+              <button class="btn-primary btn-xs cap-btn">📷 التقط</button>
+              <label class="file-label btn-secondary btn-xs">
+                🖼️ صور
+                <input type="file" multiple accept="image/*" class="multi-img-input" />
+              </label>
+              <button class="btn-danger btn-xs del-cls-btn">🗑️</button>
+            </div>
+          </div>
+          <div class="thumbs-grid"></div>
+        `;
+
+        // تبديل نوع الفئة (عادي / خطر)
+        card.querySelector(".badge-type").addEventListener("click", () => {
+          cls.isDanger = !cls.isDanger;
+          persistAll();
+          renderClassesUI();
+        });
+
+        // التقاط من الكاميرا لهذه الفئة
+        card.querySelector(".cap-btn").addEventListener("click", () => captureIntoClass(cls));
+
+        // رفع عدة صور لهذه الفئة
+        card.querySelector(".multi-img-input").addEventListener("change", async (e) => {
+          const files = Array.from(e.target.files || []).filter(f => /\.(jpe?g|png|webp|bmp|gif)$/i.test(f.name) || f.type.startsWith("image/"));
+          e.target.value = "";
+          if (files.length > 0) await processImageFilesBatch(files.map(f => ({ file: f, className: cls.name })));
+        });
+
+        // حذف الفئة
+        card.querySelector(".del-cls-btn").addEventListener("click", () => {
+          classes = classes.filter(c => c.id !== cls.id);
+          samples = samples.filter(s => s.classId !== cls.id);
+          retrainLinearHead();
+          persistAll();
+          renderClassesUI();
+          log(`تم حذف الفئة «${cls.name}».`);
+        });
+
+        // عرض آخر 8 مصغرات فقط للحفاظ على سرعة الصفحة
+        const thumbsWrap = card.querySelector(".thumbs-grid");
+        const visible = clsSamples.slice(-8);
+        if (clsSamples.length > 8) {
+          const more = document.createElement("div");
+          more.className = "more-badge";
+          more.textContent = `+${clsSamples.length - 8} أخرى`;
+          thumbsWrap.appendChild(more);
+        }
+        for (const s of visible) {
+          const t = document.createElement("div");
+          t.className = "thumb-item";
+          t.innerHTML = `<img src="${s.thumb}" /><button class="thumb-del" title="حذف">×</button>`;
+          t.querySelector(".thumb-del").addEventListener("click", () => {
+            samples = samples.filter(item => item.id !== s.id);
+            retrainLinearHead();
+            persistAll();
+            renderClassesUI();
+          });
+          thumbsWrap.appendChild(t);
+        }
+
+        classesListEl.appendChild(card);
+      }
+    }
+
+    addClassBtn.addEventListener("click", () => {
+      const cls = ensureClass(newClassInput.value);
+      if (!cls) return;
+      newClassInput.value = "";
+      persistAll();
+      renderClassesUI();
+      log(`تمت إضافة الفئة «${cls.name}».`);
+    });
+
+    newClassInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") addClassBtn.click();
+    });
+
+    document.querySelectorAll(".chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        const cls = ensureClass(chip.dataset.name);
+        if (cls) {
+          persistAll();
+          renderClassesUI();
+        }
+      });
+    });
+
+    async function captureIntoClass(cls) {
+      if (!mobilenetModel) { alert("انتظر جاهزية MobileNet v2."); return; }
+      if (isBusy) return;
+      const source = getActiveVisualSource();
+      if (!source) { alert("شغّل الكاميرا أو ارفع صورة أولاً."); return; }
+
       isBusy = true;
       try {
-        const thumb = drawCenterCropTo224(source);
+        const thumb = drawCenterCropTo224(source, true);
         const vec = await extractEmbedding(cropCanvas);
         const flipVec = await extractFlippedEmbedding();
 
         samples.push({
-          id: `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-          label,
+          id: `smp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          classId: cls.id,
           vec,
           flipVec,
           thumb
         });
 
         retrainLinearHead();
-        renderSamplesUI();
-        saveToStorage();
-
-        const names = { cat: "قطة 🐱", lion: "أسد 🦁", other: "أخرى 🚫" };
-        const colors = { cat: "var(--cat)", lion: "var(--lion)", other: "#cbd5e1" };
-        log(`تمت إضافة عينة «${names[label]}» وتحديث المصنّف.`);
-
-        if (!isLiveMode) {
-          resultBox.innerHTML = `
-            <div class="prediction-title" style="color:${colors[label]};">✓ تم حفظ عينة التدريب: ${names[label]}</div>
-            <div style="color:var(--muted); font-size:0.88rem;">
-              أصبح لديك الآن ${catCountEl.textContent} للقطة و${lionCountEl.textContent} للأسد. أضف لقطات بزوايا متنوعة أو اضغط «اختبار».
-            </div>
-          `;
-        }
+        persistAll();
+        renderClassesUI();
+        log(`تمت إضافة لقطة جديدة إلى «${cls.name}».`);
       } finally {
         isBusy = false;
       }
     }
 
-    // --- الاختبار والتخمين مع كشف الأجسام الغريبة ---
-    async function testCurrentFrame(silent = false) {
-      if (!mobilenetModel || isBusy) return;
+    // =========================================================
+    // 8. استيراد المجلدات والصور دفعة واحدة بدون تجميد المتصفح
+    // =========================================================
+    function loadBitmapFromFile(file) {
+      if ("createImageBitmap" in window) {
+        return createImageBitmap(file);
+      }
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+        img.onerror = (err) => { URL.revokeObjectURL(url); reject(err); };
+        img.src = url;
+      });
+    }
 
-      const catCount = samples.filter(s => s.label === "cat").length;
-      const lionCount = samples.filter(s => s.label === "lion").length;
-      if (catCount === 0 || lionCount === 0 || !linearHead) {
-        if (!silent) alert("درّب النموذج على صورة «قطة» واحدة على الأقل وصورة «أسد» واحدة على الأقل.");
+    async function processImageFilesBatch(items) {
+      if (!mobilenetModel) {
+        alert("انتظر حتى تكتمل شارة «جاهز للتدريب والتشغيل».");
+        return;
+      }
+      stopLiveMode();
+      cancelBatchFlag = false;
+      isBusy = true;
+
+      progressWrap.style.display = "block";
+      cancelImportBtn.style.display = "inline-flex";
+
+      let done = 0;
+      const total = items.length;
+
+      try {
+        for (const item of items) {
+          if (cancelBatchFlag) break;
+          const cls = ensureClass(item.className);
+          if (!cls) continue;
+
+          try {
+            const bmp = await loadBitmapFromFile(item.file);
+            const sw = bmp.width;
+            const sh = bmp.height;
+            const side = Math.min(sw, sh);
+            const sx = (sw - side) / 2;
+            const sy = (sh - side) / 2;
+
+            cropCanvas.getContext("2d").drawImage(bmp, sx, sy, side, side, 0, 0, 224, 224);
+            thumbCanvas.getContext("2d").drawImage(cropCanvas, 0, 0, 48, 48);
+            const thumb = thumbCanvas.toDataURL("image/jpeg", 0.6);
+
+            if (typeof bmp.close === "function") bmp.close();
+
+            const vec = await extractEmbedding(cropCanvas);
+            const flipVec = await extractFlippedEmbedding();
+
+            samples.push({
+              id: `smp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+              classId: cls.id,
+              vec,
+              flipVec,
+              thumb
+            });
+          } catch (err) {
+            console.warn("تم تخطي صورة تالفة:", item.file.name);
+          }
+
+          done++;
+          const pct = Math.round((done / total) * 100);
+          progressBar.style.width = `${pct}%`;
+          progressText.textContent = `جاري تدريب: ${done} / ${total} صورة (${cls.name}) — ${pct}%`;
+
+          // إتاحة رسم الواجهة بسلاسة
+          await new Promise(r => setTimeout(r, 0));
+        }
+
+        progressText.textContent = "جاري موازنة الأوزان النهائية لكل الفئات...";
+        await new Promise(r => setTimeout(r, 10));
+
+        retrainLinearHead();
+        persistAll();
+        renderClassesUI();
+
+        log(`تم تدريب ${done} صورة بنجاح عبر ${classes.length} فئات.`);
+        resultBox.innerHTML = `
+          <div class="prediction-title" style="color:var(--ok);">✓ اكتمل تدريب المجلدات (${done} صورة)</div>
+          <div style="color:var(--muted); font-size:0.86rem;">
+            النموذج جاهز الآن للاختبار أو تشغيل «المساعد المباشر» لفاقدي البصر.
+          </div>
+        `;
+      } finally {
+        isBusy = false;
+        cancelImportBtn.style.display = "none";
+        setTimeout(() => { progressWrap.style.display = "none"; }, 1800);
+      }
+    }
+
+    folderInput.addEventListener("change", async (e) => {
+      const files = Array.from(e.target.files || []).filter(f =>
+        f.type.startsWith("image/") || /\.(jpe?g|png|webp|bmp|gif)$/i.test(f.name)
+      );
+      folderInput.value = "";
+      if (files.length === 0) {
+        alert("لم يتم العثور على صور صالحة داخل المجلد المختار.");
+        return;
+      }
+
+      // استخراج اسم الفئة من مسار المجلد: dataset/باب/img.jpg => "باب"
+      const items = files.map(f => {
+        const parts = (f.webkitRelativePath || f.name).split("/").filter(Boolean);
+        let className = "فئة عامة";
+        if (parts.length >= 3) className = parts[1];
+        else if (parts.length === 2) className = parts[0];
+        return { file: f, className };
+      });
+
+      await processImageFilesBatch(items);
+    });
+
+    cancelImportBtn.addEventListener("click", () => {
+      cancelBatchFlag = true;
+    });
+
+    // =========================================================
+    // 9. الاختبار والتشغيل المستمر للمكفوفين
+    // =========================================================
+    async function testCurrentFrame(isLive = false) {
+      if (!mobilenetModel || isBusy) return;
+      if (!linearHead || linearHead.activeClasses.length === 0) {
+        if (!isLive) alert("أضف صوراً لفئة واحدة على الأقل قبل الاختبار.");
         return;
       }
 
       const source = getActiveVisualSource();
       if (!source) {
-        if (!silent) alert("يرجى تشغيل الكاميرا أو رفع صورة.");
+        if (!isLive) alert("شغّل الكاميرا أو ارفع صورة للاختبار.");
         return;
       }
 
       isBusy = true;
       try {
-        drawCenterCropTo224(source);
+        drawCenterCropTo224(source, false);
         const vec = await extractEmbedding(cropCanvas);
 
-        const classes = linearHead.classes;
-        const C = classes.length;
-        const useAug = augmentCheck.checked;
+        const active = linearHead.activeClasses;
+        const C = active.length;
 
-        // 1) حساب احتمالات المصنف الخطي
-        const linLogits = new Array(C);
+        // حساب التشابه (Max & Top-3 Mean) مع كل فئة نشطة
+        const maxSims = new Array(C).fill(0);
+        const topKMeans = new Array(C).fill(0);
+
         for (let c = 0; c < C; c++) {
-          linLogits[c] = linearHead.b[c] + dot(linearHead.W[c], vec);
-        }
-        const pLinear = softmax(linLogits);
-
-        // 2) حساب Top-3 Cosine Similarity لكل فئة + أقصى تشابه مطلق (للكشف عن الأجسام الغريبة)
-        const maxSim = { cat: 0, lion: 0, other: 0 };
-        const topKSim = { cat: 0, lion: 0, other: 0 };
-
-        for (const cName of classes) {
+          const cid = active[c].id;
           const sims = [];
           for (const s of samples) {
-            if (s.label !== cName) continue;
+            if (s.classId !== cid) continue;
             sims.push(dot(vec, s.vec));
-            if (useAug && s.flipVec) sims.push(dot(vec, s.flipVec));
+            if (s.flipVec) sims.push(dot(vec, s.flipVec));
           }
           sims.sort((a, b) => b - a);
-          maxSim[cName] = sims[0] || 0;
+          maxSims[c] = sims[0] || 0;
           const k = Math.min(3, sims.length);
           let sum = 0;
           for (let i = 0; i < k; i++) sum += sims[i];
-          topKSim[cName] = k > 0 ? sum / k : 0;
+          topKMeans[c] = k > 0 ? sum / k : 0;
         }
 
-        const knnLogits = classes.map(c => topKSim[c] * 18);
-        const pKnn = softmax(knnLogits);
+        let probs = new Float64Array(C);
+        if (C === 1) {
+          probs[0] = 1;
+        } else {
+          const linLogits = new Float64Array(C);
+          const pLin = new Float64Array(C);
+          for (let c = 0; c < C; c++) linLogits[c] = linearHead.b[c] + dot(linearHead.W[c], vec);
+          softmaxInto(linLogits, pLin);
 
-        // 3) الدمج الموزون حسب وضع التصنيف
-        const knnWeight = Number(modeSelect.value);
-        const probs = {};
+          const knnLogits = new Float64Array(C);
+          const pKnn = new Float64Array(C);
+          for (let c = 0; c < C; c++) knnLogits[c] = topKMeans[c] * 18;
+          softmaxInto(knnLogits, pKnn);
+
+          for (let c = 0; c < C; c++) probs[c] = 0.5 * pLin[c] + 0.5 * pKnn[c];
+        }
+
+        // إيجاد أعلى فئة وأعلى تشابه دلالي
+        let winIdx = 0;
+        let bestAnySim = 0;
         for (let c = 0; c < C; c++) {
-          probs[classes[c]] = (1 - knnWeight) * pLinear[c] + knnWeight * pKnn[c];
-        }
-
-        // تحديد الفائز
-        let winner = classes[0];
-        for (const c of classes) {
-          if (probs[c] > probs[winner]) winner = c;
+          if (probs[c] > probs[winIdx]) winIdx = c;
+          if (maxSims[c] > bestAnySim) bestAnySim = maxSims[c];
         }
 
         const oodThreshold = Number(oodRange.value) / 100;
         const confThreshold = Number(confRange.value) / 100;
+        const winClass = active[winIdx];
+        const winProb = probs[winIdx];
+        const winPct = Math.round(winProb * 100);
+        const simPct = Math.round(bestAnySim * 100);
 
-        // أعلى تشابه دلالي مع الفئات المستهدفة
-        const bestAnySim = Math.max(maxSim.cat, maxSim.lion, maxSim.other || 0);
-        const bestSimPct = Math.round(bestAnySim * 100);
-        const catSimPct = Math.round(maxSim.cat * 100);
-        const lionSimPct = Math.round(maxSim.lion * 100);
-
-        // 4) تلميح MobileNet العام (اختياري)
-        let hintHtml = "";
-        if (hintCheck.checked) {
-          const topPreds = await mobilenetModel.classify(cropCanvas, 2);
-          if (topPreds && topPreds.length > 0) {
-            const labelsStr = topPreds.map(p => `${p.className} (${Math.round(p.probability * 100)}%)`).join(" ، ");
-            hintHtml = `<div class="hint-box">💡 الرؤية الأساسية (MobileNet) تلاحظ: <strong>${labelsStr}</strong></div>`;
-          }
-        }
-
-        // 5) بناء النتيجة
-        const catPct = Math.round((probs.cat || 0) * 100);
-        const lionPct = Math.round((probs.lion || 0) * 100);
-        const otherPct = classes.includes("other") ? Math.max(0, 100 - catPct - lionPct) : 0;
-
-        let headerHtml = "";
+        let titleHtml = "";
+        let subText = "";
 
         if (bestAnySim < oodThreshold) {
-          // كشف جسم غريب (مثل طفاية السجائر)
-          headerHtml = `
-            <div class="prediction-title" style="color: var(--danger);">
-              🚫 جسم غريب / خارج نطاق التدريب
-            </div>
-            <div style="font-size:0.86rem; color: var(--muted); margin-bottom:8px;">
-              هذه الصورة لا تشبه القطة (تشابه ${catSimPct}%) ولا الأسد (تشابه ${lionSimPct}%) بشكل كافٍ — المطلوب ≥ ${oodRange.value}%.
-            </div>
-          `;
-          if (!silent) log(`تم رفض الصورة كجسم غريب (أقصى تشابه دلالي ${bestSimPct}%).`);
-        } else if (winner === "other") {
-          headerHtml = `
-            <div class="prediction-title" style="color: #cbd5e1;">
-              🚫 النتيجة: جسم آخر / ليس قطة ولا أسداً (${otherPct}%)
-            </div>
-            <div style="font-size:0.86rem; color: var(--muted); margin-bottom:8px;">
-              تطابقت الصورة مع فئة «أخرى» التي درّبتها.
-            </div>
-          `;
-          if (!silent) log(`نتيجة الاختبار: أخرى (${otherPct}%).`);
+          stableCandidate = "";
+          stableCount = 0;
+          titleHtml = `<div class="prediction-title" style="color:var(--muted);">🟢 طريق خالٍ / جسم غير معروف</div>`;
+          subText = `أعلى تشابه مع الفئات المدرَّبة هو ${simPct}% (أقل من الحد ${oodRange.value}%).`;
+        } else if (C > 1 && winProb < confThreshold) {
+          stableCandidate = "";
+          stableCount = 0;
+          titleHtml = `<div class="prediction-title" style="color:var(--warn);">⚠️ جسم غير مؤكد (الأقرب: ${winClass.name} ${winPct}%)</div>`;
+          subText = `الثقة أقل من الحد المطلوب (${confRange.value}%).`;
         } else {
-          const winConf = probs[winner];
-          const winConfPct = Math.round(winConf * 100);
-          const winLabel = winner === "cat" ? "قطة 🐱" : "أسد 🦁";
-          const winColor = winner === "cat" ? "var(--cat)" : "var(--lion)";
+          const color = winClass.isDanger ? "var(--danger)" : "var(--ok)";
+          const icon = winClass.isDanger ? "⚠️ تحذير!" : "✓ أمامك:";
+          titleHtml = `<div class="prediction-title" style="color:${color};">${icon} ${winClass.name} (${winPct}%)</div>`;
+          subText = `نسبة التشابه البصري: ${simPct}%`;
 
-          if (winConf < confThreshold) {
-            headerHtml = `
-              <div class="prediction-title" style="color: var(--warn);">
-                ⚠️ احتمال متقارب (الأقرب: ${winLabel} بنسبة ${winConfPct}%)
-              </div>
-              <div style="font-size:0.86rem; color: var(--muted); margin-bottom:8px;">
-                الثقة أقل من الحد المطلوب (${confRange.value}%). قرّب الكاميرا أو أضف عينات تدريب إضافية.
-              </div>
-            `;
+          // منطق النطق الصوتي المستقر
+          if (!isLive) {
+            speakArabic(winClass.isDanger ? `تحذير! أمامك ${winClass.name}` : `أمامك ${winClass.name}`, winClass.isDanger);
           } else {
-            headerHtml = `
-              <div class="prediction-title" style="color: ${winColor};">
-                ✓ التخمين: ${winLabel} (${winConfPct}%)
-              </div>
-              <div style="font-size:0.84rem; color: var(--muted); margin-bottom:8px;">
-                أعلى تشابه دلالي: قطة ${catSimPct}% | أسد ${lionSimPct}%
-              </div>
-            `;
+            if (stableCandidate === winClass.id) stableCount++;
+            else {
+              stableCandidate = winClass.id;
+              stableCount = 1;
+            }
+            const now = Date.now();
+            const cooldown = winClass.isDanger ? 2200 : 3500;
+            if (stableCount >= 2 && (lastSpokenClass !== winClass.id || now - lastSpokenTime > cooldown)) {
+              lastSpokenClass = winClass.id;
+              lastSpokenTime = now;
+              speakArabic(winClass.isDanger ? `تحذير! أمامك ${winClass.name}` : `أمامك ${winClass.name}`, winClass.isDanger);
+            }
           }
-          if (!silent) log(`نتيجة الاختبار: ${winLabel} (${winConfPct}%).`);
         }
 
-        const barsHtml = `
-          <div class="prob-row">
-            <span style="color:var(--cat); font-weight:700;">🐱 قطة</span>
-            <div class="meter-wrap"><div class="meter-bar" style="width:${catPct}%; background:var(--cat);"></div></div>
-            <span>${catPct}%</span>
-          </div>
-          <div class="prob-row">
-            <span style="color:var(--lion); font-weight:700;">🦁 أسد</span>
-            <div class="meter-wrap"><div class="meter-bar" style="width:${lionPct}%; background:var(--lion);"></div></div>
-            <span>${lionPct}%</span>
-          </div>
-          ${classes.includes("other") ? `
-          <div class="prob-row">
-            <span style="color:#cbd5e1; font-weight:700;">🚫 أخرى</span>
-            <div class="meter-wrap"><div class="meter-bar" style="width:${otherPct}%; background:var(--other);"></div></div>
-            <span>${otherPct}%</span>
-          </div>` : ""}
-        `;
+        // عرض أعلى 4 فئات ترتيباً
+        const ranked = active.map((c, i) => ({
+          name: c.name,
+          isDanger: c.isDanger,
+          pct: Math.round(probs[i] * 100)
+        })).sort((a, b) => b.pct - a.pct).slice(0, 4);
 
-        resultBox.innerHTML = headerHtml + barsHtml + hintHtml;
+        const barsHtml = ranked.map(r => `
+          <div class="prob-row">
+            <span class="prob-name" style="color:${r.isDanger ? "#fca5a5" : "var(--text)"};">${r.isDanger ? "⚠️" : "•"} ${r.name}</span>
+            <div class="meter-wrap"><div class="meter-bar" style="width:${r.pct}%; background:${r.isDanger ? "var(--danger)" : "var(--accent)"};"></div></div>
+            <span>${r.pct}%</span>
+          </div>
+        `).join("");
+
+        resultBox.innerHTML = `${titleHtml}<div style="font-size:0.82rem; color:var(--muted); margin-bottom:8px;">${subText}</div>${barsHtml}`;
       } finally {
         isBusy = false;
       }
     }
 
-    // --- وضع الاختبار المباشر ---
     function stopLiveMode() {
       isLiveMode = false;
       if (liveTimer) clearInterval(liveTimer);
       liveTimer = null;
+      stableCandidate = "";
+      stableCount = 0;
       liveBtn.classList.remove("active");
-      liveBtn.textContent = "⚡ اختبار مباشر: متوقف";
+      liveBtn.textContent = "⚡ المساعد المباشر: متوقف";
     }
 
     liveBtn.addEventListener("click", () => {
+      initAudio();
       if (isLiveMode) {
         stopLiveMode();
         return;
       }
-      const catCount = samples.filter(s => s.label === "cat").length;
-      const lionCount = samples.filter(s => s.label === "lion").length;
-      if (catCount === 0 || lionCount === 0) {
-        alert("درّب النموذج على صورة «قطة» وصورة «أسد» أولاً قبل تفعيل الاختبار المباشر.");
+      if (!linearHead || linearHead.activeClasses.length === 0) {
+        alert("درّب فئة واحدة على الأقل أولاً.");
         return;
       }
       if (!getActiveVisualSource()) {
-        alert("شغّل الكاميرا أولاً لتفعيل الاختبار المباشر.");
+        alert("شغّل الكاميرا أولاً لتفعيل المساعد المباشر.");
         return;
       }
       isLiveMode = true;
       liveBtn.classList.add("active");
-      liveBtn.textContent = "⚡ اختبار مباشر: يعمل";
+      liveBtn.textContent = "⚡ المساعد المباشر: يعمل";
       liveTimer = setInterval(() => {
-        if (!hasUploadedSource && video.readyState >= 2) {
-          testCurrentFrame(true);
-        }
-      }, 420);
+        if (!hasUploadedSource && video.readyState >= 2) testCurrentFrame(true);
+      }, 380);
     });
 
-    // --- أحداث الأزرار والإعدادات ---
-    trainCatBtn.addEventListener("click", () => trainSample("cat"));
-    trainLionBtn.addEventListener("click", () => trainSample("lion"));
-    trainOtherBtn.addEventListener("click", () => trainSample("other"));
-    testBtn.addEventListener("click", () => testCurrentFrame(false));
-
-    resetBtn.addEventListener("click", () => {
-      stopLiveMode();
-      samples = [];
-      linearHead = null;
-      localStorage.removeItem(STORAGE_KEY);
-      renderSamplesUI();
-      resultBox.innerHTML = `
-        <div class="prediction-title">تم تصفير النموذج بالكامل</div>
-        <div style="color: var(--muted); font-size: 0.88rem;">يمكنك البدء بتدريب جديد من الصفر الآن.</div>
-      `;
-      log("تم مسح جميع عينات التدريب والأوزان.");
+    testBtn.addEventListener("click", () => {
+      initAudio();
+      testCurrentFrame(false);
     });
 
-    oodRange.addEventListener("input", () => {
-      oodVal.textContent = `${oodRange.value}%`;
-    });
+    // =========================================================
+    // 10. التصدير والاستيراد والإعدادات
+    // =========================================================
+    oodRange.addEventListener("input", () => oodVal.textContent = `${oodRange.value}%`);
+    confRange.addEventListener("input", () => confVal.textContent = `${confRange.value}%`);
 
-    confRange.addEventListener("input", () => {
-      confVal.textContent = `${confRange.value}%`;
-    });
-
-    modeSelect.addEventListener("change", () => {
-      const labels = { "0.5": "متوازن", "0.8": "صارم", "0.25": "مرن" };
-      modeLabel.textContent = labels[modeSelect.value] || "متوازن";
-    });
-
-    augmentCheck.addEventListener("change", () => {
-      retrainLinearHead();
-      log(augmentCheck.checked ? "تم تفعيل النسخ المعكوسة أفقياً." : "تم إيقاف النسخ المعكوسة أفقياً.");
-    });
-
-    // تصدير واستيراد JSON
     exportBtn.addEventListener("click", () => {
       if (samples.length === 0) {
-        alert("لا توجد عينات تدريب لتصديرها.");
+        alert("لا توجد بيانات تدريب لتصديرها.");
         return;
       }
-      const blob = new Blob([JSON.stringify(samples)], { type: "application/json" });
+      // تصدير خفيف بدون الصور المصغرة لتقليل الحجم للمشاريع النهائية (أو الاحتفاظ بها عند الرغبة)
+      const lightSamples = samples.map(s => ({ id: s.id, classId: s.classId, vec: s.vec, flipVec: s.flipVec, thumb: s.thumb }));
+      const blob = new Blob([JSON.stringify({ classes, samples: lightSamples })], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "cat-lion-model.json";
+      a.download = "blind-assist-vision-model.json";
       a.click();
       URL.revokeObjectURL(url);
-      log("تم تصدير ملف النموذج (cat-lion-model.json).");
+      log("تم تصدير النموذج الجاهز (blind-assist-vision-model.json).");
     });
 
-    importInput.addEventListener("change", (e) => {
+    importModelInput.addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = (ev) => {
         try {
-          const parsed = JSON.parse(ev.target.result);
-          if (!Array.isArray(parsed) || !parsed[0]?.vec) throw new Error("صيغة ملف غير صالحة");
-          samples = parsed;
+          const data = JSON.parse(ev.target.result);
+          if (!Array.isArray(data.classes) || !Array.isArray(data.samples)) {
+            throw new Error("ملف النموذج غير صالح.");
+          }
+          classes = data.classes;
+          samples = data.samples;
           retrainLinearHead();
-          renderSamplesUI();
-          saveToStorage();
-          log(`تم استيراد ${samples.length} عينة تدريب بنجاح.`);
+          persistAll();
+          renderClassesUI();
+          log(`تم استيراد النموذج بنجاح (${classes.length} فئات، ${samples.length} عينة).`);
         } catch (err) {
-          alert("تعذر قراءة الملف: " + err.message);
+          alert(err.message);
         }
       };
       reader.readAsText(file);
-      importInput.value = "";
+      importModelInput.value = "";
     });
 
-    // بدء التشغيل
+    resetAllBtn.addEventListener("click", async () => {
+      if (!confirm("هل تريد مسح جميع الفئات والصور المدرَّبة؟")) return;
+      stopLiveMode();
+      classes = [];
+      samples = [];
+      linearHead = null;
+      await dbSave({ classes: [], samples: [] });
+      renderClassesUI();
+      resultBox.innerHTML = `<div class="prediction-title">تم تصفير جميع الفئات</div>`;
+      log("تم مسح كل البيانات.");
+    });
+
     initMobileNet();
   </script>
 </body>

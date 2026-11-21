@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>مدرب الرؤية الذكي لفاقدي البصر — فئات ومجلدات غير محدودة</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1"></script>
+  <title>المساعد البصري المستقل (بدون أي نموذج خارجي)</title>
   <style>
     :root {
       --bg: #0b1120;
@@ -21,173 +19,48 @@
       --border: #283548;
     }
 
-    * {
-      box-sizing: border-box;
-      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
-    }
-
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      padding: 16px;
-      line-height: 1.55;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      gap: 16px;
-    }
+    * { box-sizing: border-box; font-family: "Segoe UI", Tahoma, Arial, sans-serif; }
+    body { margin: 0; background: var(--bg); color: var(--text); padding: 16px; line-height: 1.55; }
+    .container { max-width: 1220px; margin: 0 auto; display: grid; gap: 16px; }
 
     header {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px 20px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 16px 20px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;
     }
-
-    header h1 {
-      margin: 0 0 4px;
-      font-size: 1.3rem;
-    }
-
-    header p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
+    header h1 { margin: 0 0 4px; font-size: 1.28rem; }
+    header p { margin: 0; color: var(--muted); font-size: 0.88rem; }
 
     .status-badge {
-      padding: 8px 14px;
-      border-radius: 999px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
+      padding: 7px 13px; border-radius: 999px; font-size: 0.82rem; font-weight: 700;
+      background: var(--card-2); border: 1px solid var(--border); display: inline-flex; align-items: center; gap: 7px;
     }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 8px var(--ok); }
 
-    .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--warn);
-    }
-    .dot.ready { background: var(--ok); box-shadow: 0 0 8px var(--ok); }
-    .dot.error { background: var(--danger); }
+    .grid-main { display: grid; grid-template-columns: 1.15fr 1fr; gap: 16px; align-items: start; }
+    @media (max-width: 920px) { .grid-main { grid-template-columns: 1fr; } }
 
-    .grid-main {
-      display: grid;
-      grid-template-columns: 1.1fr 1fr;
-      gap: 16px;
-      align-items: start;
-    }
-
-    @media (max-width: 920px) {
-      .grid-main { grid-template-columns: 1fr; }
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px;
-    }
-
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; }
     .card h2 {
-      margin: 0 0 12px;
-      font-size: 1.05rem;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
+      margin: 0 0 12px; font-size: 1.03rem; border-bottom: 1px solid var(--border);
+      padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px;
     }
 
     .camera-box {
-      position: relative;
-      background: var(--card-2);
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      aspect-ratio: 4 / 3;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: relative; background: var(--card-2); border-radius: 12px; overflow: hidden;
+      border: 1px solid var(--border); aspect-ratio: 4 / 3; display: flex; align-items: center; justify-content: center;
     }
+    video, canvas.preview, canvas.overlay { width: 100%; height: 100%; object-fit: cover; display: block; }
+    canvas.overlay { position: absolute; inset: 0; pointer-events: none; }
+    .camera-placeholder { color: var(--muted); text-align: center; padding: 18px; font-size: 0.9rem; }
 
-    video, canvas.preview {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .crop-guide {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .crop-square {
-      height: 86%;
-      aspect-ratio: 1 / 1;
-      border: 2px dashed rgba(56, 189, 248, 0.45);
-      border-radius: 12px;
-    }
-
-    .camera-placeholder {
-      color: var(--muted);
-      text-align: center;
-      padding: 18px;
-      font-size: 0.92rem;
-    }
-
-    .row-btns {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
+    .row-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
     button, .file-label {
-      border: none;
-      border-radius: 10px;
-      padding: 9px 13px;
-      font-size: 0.88rem;
-      font-weight: 700;
-      cursor: pointer;
-      color: #fff;
-      transition: transform 0.1s ease, opacity 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
+      border: none; border-radius: 10px; padding: 9px 13px; font-size: 0.87rem; font-weight: 700;
+      cursor: pointer; color: #fff; transition: transform 0.1s ease, opacity 0.15s ease;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     }
-
-    button:hover:not(:disabled), .file-label:hover {
-      opacity: 0.92;
-      transform: translateY(-1px);
-    }
-
-    button:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      transform: none;
-    }
+    button:hover:not(:disabled), .file-label:hover { opacity: 0.92; transform: translateY(-1px); }
+    button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
     .btn-primary { background: #0284c7; }
     .btn-secondary { background: #334155; }
@@ -198,274 +71,97 @@
     .btn-live.active { background: #0d9488; border-color: #14b8a6; }
     .btn-voice { background: #1e293b; border: 1px solid var(--border); }
     .btn-voice.active { background: #0369a1; border-color: var(--accent); }
+    .btn-mic { background: #be123c; }
+    .btn-mic.listening { background: #e11d48; box-shadow: 0 0 12px rgba(225, 29, 72, 0.7); }
 
     input[type="file"] { display: none; }
-
     input[type="text"] {
-      background: var(--card-2);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 9px 12px;
-      font-size: 0.92rem;
-      flex: 1;
-      min-width: 150px;
-      outline: none;
+      background: var(--card-2); color: var(--text); border: 1px solid var(--border);
+      border-radius: 10px; padding: 9px 12px; font-size: 0.9rem; flex: 1; min-width: 140px; outline: none;
     }
+    input[type="text"]:focus { border-color: var(--accent); }
 
-    input[type="text"]:focus {
-      border-color: var(--accent);
-    }
-
-    .result-box {
+    .qa-panel {
       margin-top: 12px;
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      min-height: 120px;
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.08), rgba(34, 197, 94, 0.06));
+      border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 14px; padding: 12px;
+    }
+    .qa-title {
+      font-weight: 800; font-size: 0.94rem; margin-bottom: 8px;
+      display: flex; justify-content: space-between; align-items: center; color: var(--accent);
     }
 
-    .prediction-title {
-      font-size: 1.25rem;
-      font-weight: 800;
-      margin-bottom: 6px;
-    }
-
-    .prob-row {
-      display: grid;
-      grid-template-columns: 110px 1fr 44px;
-      align-items: center;
-      gap: 8px;
-      margin: 5px 0;
-      font-size: 0.84rem;
-    }
-
-    .prob-name {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      font-weight: 700;
-    }
-
-    .meter-wrap {
-      background: #1e293b;
-      border-radius: 999px;
-      height: 9px;
-      overflow: hidden;
-    }
-
-    .meter-bar {
-      height: 100%;
-      width: 0%;
-      border-radius: 999px;
-      transition: width 0.2s ease;
-    }
-
-    /* قسم الفئات والمجلدات */
-    .quick-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 8px;
-    }
-
+    .quick-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
     .chip {
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      cursor: pointer;
+      background: var(--card-2); border: 1px solid var(--border); color: var(--muted);
+      padding: 4px 10px; border-radius: 999px; font-size: 0.77rem; cursor: pointer;
     }
+    .chip:hover { border-color: var(--accent); color: var(--text); }
 
-    .chip:hover {
-      border-color: var(--accent);
-      color: var(--text);
+    .answer-box {
+      margin-top: 10px; background: var(--card-2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px; min-height: 92px;
     }
+    .intent-tag {
+      display: inline-block; font-size: 0.74rem; padding: 2px 8px; border-radius: 999px;
+      background: rgba(56, 189, 248, 0.14); color: var(--accent); margin-bottom: 6px; font-weight: 700;
+    }
+    .answer-text { font-size: 1.03rem; font-weight: 700; line-height: 1.65; }
+
+    .sensors-strip {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px;
+    }
+    .sensor-pill {
+      background: var(--card-2); border: 1px solid var(--border); border-radius: 10px;
+      padding: 7px 10px; font-size: 0.78rem; text-align: center;
+    }
+    .sensor-pill strong { display: block; font-size: 0.85rem; margin-top: 2px; color: var(--accent); }
 
     .folder-box {
-      background: linear-gradient(135deg, rgba(2, 132, 199, 0.14), rgba(139, 92, 246, 0.12));
-      border: 1px dashed var(--accent);
-      border-radius: 12px;
-      padding: 12px;
-      margin-top: 12px;
+      background: rgba(2, 132, 199, 0.1); border: 1px dashed var(--accent);
+      border-radius: 12px; padding: 11px; margin-top: 10px;
     }
-
     .progress-wrap {
-      display: none;
-      margin-top: 10px;
-      background: var(--card-2);
-      border-radius: 8px;
-      padding: 8px 10px;
-      border: 1px solid var(--border);
-      font-size: 0.82rem;
+      display: none; margin-top: 8px; background: var(--card-2); border-radius: 8px;
+      padding: 8px 10px; border: 1px solid var(--border); font-size: 0.8rem;
     }
+    .meter-wrap { background: #1e293b; border-radius: 999px; height: 8px; overflow: hidden; }
+    .meter-bar { height: 100%; width: 0%; border-radius: 999px; transition: width 0.2s ease; }
 
-    .classes-list {
-      display: grid;
-      gap: 10px;
-      margin-top: 12px;
-      max-height: 430px;
-      overflow-y: auto;
-      padding-left: 2px;
-    }
+    .classes-list { display: grid; gap: 9px; margin-top: 12px; max-height: 400px; overflow-y: auto; }
+    .class-card { background: var(--card-2); border: 1px solid var(--border); border-radius: 12px; padding: 10px; }
+    .class-card.is-danger { border-color: rgba(239, 68, 68, 0.5); }
+    .class-card.is-bg { border-color: rgba(148, 163, 184, 0.45); }
 
-    .class-card {
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px 12px;
-    }
+    .class-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 6px; }
+    .class-title-wrap { display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 0.92rem; }
 
-    .class-card.is-danger {
-      border-color: rgba(239, 68, 68, 0.5);
-    }
+    .badge-type { font-size: 0.72rem; padding: 2px 8px; border-radius: 999px; cursor: pointer; border: 1px solid transparent; }
+    .badge-normal { background: rgba(34,197,94,0.14); color: var(--ok); border-color: rgba(34,197,94,0.35); }
+    .badge-danger { background: rgba(239,68,68,0.18); color: #fca5a5; border-color: rgba(239,68,68,0.45); }
+    .badge-bg { background: rgba(148,163,184,0.16); color: #cbd5e1; border-color: rgba(148,163,184,0.35); }
 
-    .class-header {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-
-    .class-title-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 800;
-      font-size: 0.98rem;
-    }
-
-    .badge-type {
-      font-size: 0.75rem;
-      padding: 2px 8px;
-      border-radius: 999px;
-      cursor: pointer;
-      border: 1px solid transparent;
-    }
-
-    .badge-normal {
-      background: rgba(34, 197, 94, 0.15);
-      color: var(--ok);
-      border-color: rgba(34, 197, 94, 0.35);
-    }
-
-    .badge-danger {
-      background: rgba(239, 68, 68, 0.18);
-      color: #fca5a5;
-      border-color: rgba(239, 68, 68, 0.45);
-    }
-
-    .class-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .btn-xs {
-      padding: 5px 9px;
-      font-size: 0.78rem;
-      border-radius: 8px;
-    }
-
-    .thumbs-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      margin-top: 6px;
-    }
-
-    .thumb-item {
-      position: relative;
-      width: 40px;
-      height: 40px;
-      border-radius: 6px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-
-    .thumb-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
+    .btn-xs { padding: 5px 8px; font-size: 0.76rem; border-radius: 8px; }
+    .thumbs-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+    .thumb-item { position: relative; width: 38px; height: 38px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); }
+    .thumb-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .thumb-del {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 15px;
-      height: 15px;
-      padding: 0;
-      border-radius: 4px;
-      background: rgba(15, 23, 42, 0.85);
-      color: #fff;
-      font-size: 10px;
-      line-height: 1;
+      position: absolute; top: 0; left: 0; width: 14px; height: 14px; padding: 0;
+      border-radius: 3px; background: rgba(15,23,42,0.85); color: #fff; font-size: 10px; line-height: 1;
     }
-
     .more-badge {
-      height: 40px;
-      padding: 0 8px;
-      border-radius: 6px;
-      background: #1e293b;
-      color: var(--muted);
-      font-size: 0.76rem;
-      display: inline-flex;
-      align-items: center;
+      height: 38px; padding: 0 7px; border-radius: 6px; background: #1e293b;
+      color: var(--muted); font-size: 0.74rem; display: inline-flex; align-items: center;
     }
 
-    .setting-item {
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      margin-top: 10px;
-    }
-
-    .setting-header {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.86rem;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
-    .setting-desc {
-      font-size: 0.77rem;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    input[type="range"], select {
-      width: 100%;
-      accent-color: var(--accent);
-    }
-
-    select {
-      background: var(--card);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 7px;
-      font-size: 0.85rem;
-    }
+    .setting-item { background: var(--card-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-top: 10px; }
+    .setting-header { display: flex; justify-content: space-between; font-size: 0.84rem; font-weight: 700; margin-bottom: 4px; }
+    .setting-desc { font-size: 0.76rem; color: var(--muted); margin-top: 4px; }
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
 
     .log {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-top: 10px;
-      max-height: 95px;
-      overflow-y: auto;
-      background: var(--card-2);
-      padding: 8px 10px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
+      font-size: 0.77rem; color: var(--muted); margin-top: 10px; max-height: 90px;
+      overflow-y: auto; background: var(--card-2); padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border);
     }
   </style>
 </head>
@@ -473,157 +169,180 @@
   <div class="container">
     <header>
       <div>
-        <h1>🦯 مدرب ومساعد الرؤية الذكي لفاقدي البصر</h1>
-        <p>أنشئ أي فئة بالاسم (أبواب، حفر، نار، سلالم صاعدة...) أو ارفع مجلدات كاملة لتدريب نموذج خفيف وسريع مع نطق عربي فوري.</p>
+        <h1>🦯 المساعد البصري المستقل 100% (محلي بدون أي نموذج خارجي)</h1>
+        <p>خوارزمية رؤية حاسوبية مكتوبة من الصفر (<strong>HOG + HSV + Texture</strong>) + كاشف حركة وإضاءة + فهم الأسئلة العربية ونطقها أوفلاين.</p>
       </div>
       <div class="status-badge">
-        <span id="statusDot" class="dot"></span>
-        <span id="statusText">جاري تحميل MobileNet v2...</span>
+        <span class="dot"></span>
+        <span>جاهز فوراً (0% اعتماد خارجي)</span>
       </div>
     </header>
 
     <div class="grid-main">
-      <!-- العمود الأول: الكاميرا، الاختبار، والمساعد الصوتي -->
+      <!-- العمود الأول: الكاميرا، الحساسات، والمساعد التفاعلي -->
       <div class="card">
         <h2>
-          <span>1. الكاميرا والاختبار والمساعد الصوتي</span>
+          <span>1. الكاميرا والمساعد التفاعلي</span>
           <button id="backToCamBtn" class="btn-secondary btn-xs" style="display:none;">📹 العودة للكاميرا</button>
         </h2>
 
         <div class="camera-box">
           <video id="video" autoplay playsinline muted style="display:none;"></video>
           <canvas id="snapshotCanvas" class="preview" style="display:none;"></canvas>
-          <div id="cropGuide" class="crop-guide" style="display:none;">
-            <div class="crop-square"></div>
-          </div>
+          <canvas id="overlayCanvas" class="overlay"></canvas>
           <div id="placeholder" class="camera-placeholder">
-            اضغط <strong>تشغيل الكاميرا</strong> أو <strong>رفع صورة للاختبار</strong>.<br/>
-            <span style="font-size:0.8rem;">عند تشغيل المساعد الصوتي والوضع المباشر، ينطق النظام أي عائق أو باب أو خطر يظهر أمام الكاميرا.</span>
+            اضغط <strong>تشغيل الكاميرا</strong> أو <strong>ارفع صورة</strong>.<br/>
+            <span style="font-size:0.8rem;">كل المعالجة والتدريب تتم محلياً داخل متصفحك بسرعة فائقة دون تحميل أي ملفات خارجية.</span>
           </div>
+        </div>
+
+        <div class="sensors-strip">
+          <div class="sensor-pill">💡 الإضاءة <strong id="lightSensorVal">—</strong></div>
+          <div class="sensor-pill">🏃 الحركة <strong id="motionSensorVal">—</strong></div>
+          <div class="sensor-pill">⚡ زمن التحليل <strong id="speedSensorVal">—</strong></div>
         </div>
 
         <div class="row-btns">
           <button id="startCamBtn" class="btn-primary">📷 تشغيل الكاميرا</button>
-          <button id="switchCamBtn" class="btn-secondary" disabled>🔄 تبديل الكاميرا</button>
+          <button id="switchCamBtn" class="btn-secondary" disabled>🔄 تبديل</button>
           <label class="file-label btn-secondary">
-            🖼️ اختبار صورة من الجهاز
+            🖼️ اختبار صورة
             <input type="file" id="testImageUpload" accept="image/*" />
           </label>
-          <button id="voiceBtn" class="btn-voice active">🔊 الصوت: مفعّل</button>
+          <button id="voiceBtn" class="btn-voice active">🔊 النطق: مفعّل</button>
         </div>
 
         <div class="row-btns">
-          <button id="testBtn" class="btn-purple" style="flex:1.2;" disabled>🔍 اختبار لقطة واحدة</button>
-          <button id="liveBtn" class="btn-live" disabled>⚡ المساعد المباشر: متوقف</button>
+          <button id="describeBtn" class="btn-purple" style="flex:1;">👁️ صف المشهد</button>
+          <button id="safetyBtn" class="btn-primary" style="flex:1;">🛡️ فحص الأمان</button>
+          <button id="liveBtn" class="btn-live">⚡ تنبيه تلقائي: متوقف</button>
         </div>
 
-        <div id="resultBox" class="result-box" aria-live="polite">
-          <div class="prediction-title">بانتظار جاهزية المحرك والفئات...</div>
-          <div style="color: var(--muted); font-size: 0.86rem;">
-            أضف فئاتك من القسم المقابل (أو استورد مجلدات الفئات دفعة واحدة)، ثم جرّب الاختبار الفردي أو المباشر.
+        <!-- صندوق الأسئلة الذكية -->
+        <div class="qa-panel">
+          <div class="qa-title">
+            <span>🧠 اسأل المساعد بأي صيغة عربية</span>
+            <span style="font-size:0.74rem; color:var(--muted); font-weight:400;">NLU محلي صرف</span>
+          </div>
+
+          <div class="row-btns" style="margin-top:0;">
+            <button id="micBtn" class="btn-mic">🎤 اسأل بصوتك</button>
+            <input type="text" id="questionInput" placeholder="مثلاً: فين الباب؟ / في حفرة قدامي؟ / المكان منور؟ / في حركة؟" />
+            <button id="askBtn" class="btn-ok">اسأل</button>
+          </div>
+
+          <div class="quick-chips">
+            <span class="chip q-chip" data-q="وصفلي ايه اللي قدامي؟">ماذا أرى أمامي؟</span>
+            <span class="chip q-chip" data-q="هل الطريق أمان ولا في خطر؟">هل الطريق أمان؟</span>
+            <span class="chip q-chip" data-q="فين الباب شايفه؟">فين الباب؟</span>
+            <span class="chip q-chip" data-q="الدنيا منورة ولا ضلمة؟">هل الإضاءة جيدة؟</span>
+            <span class="chip q-chip" data-q="في حد بيتحرك قدامي؟">هل هناك حركة؟</span>
+            <span class="chip q-chip" data-q="انت متدرب على ايه؟">ماذا تعرف؟</span>
+          </div>
+
+          <div id="answerBox" class="answer-box" aria-live="polite">
+            <div class="intent-tag">جاهز للاستخدام</div>
+            <div class="answer-text" style="font-size:0.93rem; color:var(--muted);">
+              أضف فئاتك أو استورد مجلدات الصور من اليسار، ثم اضغط «صف المشهد» أو اسأل بأي أسلوب.
+            </div>
           </div>
         </div>
 
-        <!-- إعدادات الدقة والحفظ -->
-        <div class="setting-item">
-          <div class="setting-header">
-            <span>حد رفض الأجسام غير المعروفة (منع التخمين العشوائي)</span>
-            <span id="oodVal">56%</span>
-          </div>
-          <input type="range" id="oodRange" min="35" max="80" value="56" />
-          <div class="setting-desc">
-            إذا لم يشبه المشهد أي فئة مدرَّبة بهذه النسبة، يظل صامتاً ويعرض «طريق خالٍ / جسم غير معروف».
-          </div>
-        </div>
-
-        <div class="setting-item">
-          <div class="setting-header">
-            <span>حد الثقة المطلوب للنطق والقرار</span>
-            <span id="confVal">62%</span>
-          </div>
-          <input type="range" id="confRange" min="45" max="90" value="62" />
-        </div>
-
-        <div class="row-btns" style="margin-top:10px;">
-          <button id="exportBtn" class="btn-secondary" style="flex:1;">💾 تصدير النموذج (JSON)</button>
-          <label class="file-label btn-secondary" style="flex:1;">
-            📂 استيراد نموذج (JSON)
-            <input type="file" id="importModelInput" accept="application/json" />
-          </label>
-          <button id="resetAllBtn" class="btn-danger">🗑️ تصفير الكل</button>
-        </div>
-
-        <div id="logBox" class="log">سجل العمليات جاهز.</div>
+        <div id="logBox" class="log">سجل العمليات جاهز (100% أوفلاين).</div>
       </div>
 
-      <!-- العمود الثاني: إنشاء الفئات واستيراد المجلدات -->
+      <!-- العمود الثاني: الفئات والمجلدات والإعدادات -->
       <div class="card">
         <h2>
-          <span>2. الفئات والتدريب بالمجلدات أو الكاميرا</span>
+          <span>2. الفئات والمجلدات (تدريب محلي)</span>
           <span id="totalSamplesBadge" style="font-size:0.8rem; color:var(--accent);">0 صورة</span>
         </h2>
 
-        <!-- إضافة فئة يدوياً -->
         <div class="row-btns" style="margin-top:0;">
-          <input type="text" id="newClassInput" placeholder="اكتب اسم الفئة (مثل: باب، حفرة، نار، سلالم صاعدة)..." />
-          <button id="addClassBtn" class="btn-ok">➕ إضافة فئة</button>
+          <input type="text" id="newClassInput" placeholder="اكتب اسم الفئة (باب، حفرة، نار، طريق خالٍ...)..." />
+          <button id="addClassBtn" class="btn-ok">➕ إضافة</button>
         </div>
 
         <div class="quick-chips">
-          <span style="font-size:0.78rem; color:var(--muted); align-self:center;">إضافة سريعة:</span>
-          <span class="chip" data-name="باب">+ باب</span>
-          <span class="chip" data-name="سلالم صاعدة">+ سلالم صاعدة</span>
-          <span class="chip" data-name="سلالم هابطة">+ سلالم هابطة</span>
-          <span class="chip" data-name="حفرة">+ حفرة</span>
-          <span class="chip" data-name="نار">+ نار</span>
-          <span class="chip" data-name="عائق">+ عائق</span>
+          <span style="font-size:0.76rem; color:var(--muted); align-self:center;">إضافة سريعة:</span>
+          <span class="chip add-chip" data-name="باب">+ باب</span>
+          <span class="chip add-chip" data-name="حفرة">+ حفرة</span>
+          <span class="chip add-chip" data-name="نار">+ نار</span>
+          <span class="chip add-chip" data-name="سلالم صاعدة">+ سلالم صاعدة</span>
+          <span class="chip add-chip" data-name="مفاتيح">+ مفاتيح</span>
+          <span class="chip add-chip" data-name="طريق خالٍ">+ طريق خالٍ (موصى به)</span>
         </div>
 
-        <!-- استيراد مجلدات دفعة واحدة -->
         <div class="folder-box">
-          <div style="font-weight:700; font-size:0.9rem; margin-bottom:4px;">📁 تدريب سريع من مجلدات جاهزة</div>
-          <div style="font-size:0.79rem; color:var(--muted); margin-bottom:8px;">
-            ضع صور كل فئة داخل مجلد باسمها (مثلاً: <code>dataset/باب/</code> و<code>dataset/حفرة/</code> و<code>dataset/نار/</code>)، ثم اختر المجلد الرئيسي هنا ليتم إنشاء الفئات وتدريبها تلقائياً:
+          <div style="font-weight:700; font-size:0.88rem; margin-bottom:3px;">📁 تدريب مجلدات كاملة دفعة واحدة</div>
+          <div style="font-size:0.77rem; color:var(--muted); margin-bottom:8px;">
+            رتّب صورك في مجلدات باسم كل فئة (مثل: <code>باب/</code>، <code>حفرة/</code>، <code>طريق خالٍ/</code>) واختر المجلد الرئيسي هنا:
           </div>
           <div class="row-btns" style="margin-top:0;">
-            <label id="folderImportLabel" class="file-label btn-primary" style="flex:1;">
-              📂 اختيار مجلد الفئات الرئيسي للتدريب
+            <label class="file-label btn-primary" style="flex:1;">
+              📂 اختيار مجلد الفئات الرئيسي
               <input type="file" id="folderInput" webkitdirectory directory multiple accept="image/*" />
             </label>
             <button id="cancelImportBtn" class="btn-danger" style="display:none;">⏹️ إيقاف</button>
           </div>
           <div id="progressWrap" class="progress-wrap">
             <div id="progressText" style="margin-bottom:5px;">جاري المعالجة...</div>
-            <div class="meter-wrap">
-              <div id="progressBar" class="meter-bar" style="background:var(--accent); width:0%;"></div>
-            </div>
+            <div class="meter-wrap"><div id="progressBar" class="meter-bar" style="background:var(--accent);"></div></div>
           </div>
         </div>
 
-        <!-- قائمة الفئات -->
         <div id="classesList" class="classes-list"></div>
+
+        <div class="setting-item">
+          <div class="setting-header">
+            <span>حد التشابه البصري (لرفض الأجسام الغريبة)</span>
+            <span id="oodVal">66%</span>
+          </div>
+          <input type="range" id="oodRange" min="45" max="90" value="66" />
+          <div class="setting-desc">
+            إذا كان التشابه الشكلي واللوني أقل من هذا الحد، يرفض النموذج التخمين الخاطئ.
+          </div>
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-header">
+            <span>حد الثقة المطلوب للقرار</span>
+            <span id="confVal">58%</span>
+          </div>
+          <input type="range" id="confRange" min="40" max="90" value="58" />
+        </div>
+
+        <div class="row-btns" style="margin-top:10px;">
+          <button id="exportBtn" class="btn-secondary" style="flex:1;">💾 تصدير (JSON)</button>
+          <label class="file-label btn-secondary" style="flex:1;">
+            📂 استيراد (JSON)
+            <input type="file" id="importModelInput" accept="application/json" />
+          </label>
+          <button id="resetAllBtn" class="btn-danger">🗑️ تصفير</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- كانفاس مخفي للمعالجة -->
-  <canvas id="cropCanvas" width="224" height="224" style="display:none;"></canvas>
-  <canvas id="flipCanvas" width="224" height="224" style="display:none;"></canvas>
+  <!-- كانفاس معالجة مخفي -->
+  <canvas id="featCanvas" width="64" height="64" style="display:none;"></canvas>
+  <canvas id="flipCanvas" width="64" height="64" style="display:none;"></canvas>
   <canvas id="thumbCanvas" width="48" height="48" style="display:none;"></canvas>
+  <canvas id="motionCanvas" width="32" height="32" style="display:none;"></canvas>
+  <canvas id="workCanvas" style="display:none;"></canvas>
 
   <script>
     // =========================================================
-    // 1. قاعدة بيانات IndexedDB لتخزين مئات الصور محلياً بدون قيود 5MB
+    // 1. قاعدة البيانات المحلية IndexedDB
     // =========================================================
-    const DB_NAME = "BlindAssistVisionDB_v1";
+    const DB_NAME = "PureJSVisionDB_v1";
     const STORE_NAME = "state";
 
     function openDB() {
       return new Promise((resolve, reject) => {
         const req = indexedDB.open(DB_NAME, 1);
         req.onupgradeneeded = () => {
-          const db = req.result;
-          if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME);
+          if (!req.result.objectStoreNames.contains(STORE_NAME)) req.result.createObjectStore(STORE_NAME);
         };
         req.onsuccess = () => resolve(req.result);
         req.onerror = () => reject(req.error);
@@ -633,15 +352,13 @@
     async function dbSave(payload) {
       try {
         const db = await openDB();
-        return await new Promise((resolve, reject) => {
+        await new Promise((resolve, reject) => {
           const tx = db.transaction(STORE_NAME, "readwrite");
           tx.objectStore(STORE_NAME).put(payload, "appData");
           tx.oncomplete = () => resolve();
           tx.onerror = () => reject(tx.error);
         });
-      } catch (e) {
-        console.warn("IndexedDB Save Error:", e);
-      }
+      } catch (e) {}
     }
 
     async function dbLoad() {
@@ -653,37 +370,552 @@
           req.onsuccess = () => resolve(req.result || null);
           req.onerror = () => reject(req.error);
         });
-      } catch (e) {
-        return null;
-      }
+      } catch (e) { return null; }
     }
 
     // =========================================================
-    // 2. المتغيرات والعناصر
+    // 2. محرك استخراج الميزات الكلاسيكية (HOG + Spatial HSV + Texture)
+    //    مكتوب 100% بجافاسكريبت الصافية بدون أي نموذج خارجي
+    // =========================================================
+    const featCanvas = document.getElementById("featCanvas");
+    const flipCanvas = document.getElementById("flipCanvas");
+    const thumbCanvas = document.getElementById("thumbCanvas");
+    const motionCanvas = document.getElementById("motionCanvas");
+    const workCanvas = document.getElementById("workCanvas");
+
+    function rgbToHsv(r, g, b) {
+      const max = r > g ? (r > b ? r : b) : (g > b ? g : b);
+      const min = r < g ? (r < b ? r : b) : (g < b ? g : b);
+      const d = max - min;
+      const v = max;
+      const s = max === 0 ? 0 : d / max;
+      let h = 0;
+      if (d !== 0) {
+        if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+        else if (max === g) h = ((b - r) / d + 2) / 6;
+        else h = ((r - g) / d + 4) / 6;
+      }
+      return [h, s, v];
+    }
+
+    function extractClassicalFeatures(canvas64) {
+      const W = 64, H = 64, N = W * H;
+      const data = canvas64.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, W, H).data;
+
+      const lum = new Float32Array(N);
+      const hueArr = new Uint8Array(N);
+      const satArr = new Float32Array(N);
+      const valArr = new Float32Array(N);
+
+      for (let i = 0; i < N; i++) {
+        const r = data[i * 4] / 255;
+        const g = data[i * 4 + 1] / 255;
+        const b = data[i * 4 + 2] / 255;
+        lum[i] = 0.299 * r + 0.587 * g + 0.114 * b;
+        const [h, s, v] = rgbToHsv(r, g, b);
+        hueArr[i] = Math.min(7, Math.floor(h * 8));
+        satArr[i] = s;
+        valArr[i] = v;
+      }
+
+      // أ) HOG: 8×8 خلايا × 8 اتجاهات = 512 ميزة (تفهم الشكل والحواف وتقاوم الإضاءة)
+      const hog = new Float32Array(8 * 8 * 8);
+      const gradMag = new Float32Array(N);
+
+      for (let y = 0; y < H; y++) {
+        const ym = y > 0 ? y - 1 : 0;
+        const yp = y < H - 1 ? y + 1 : H - 1;
+        const cy = y >> 3; // 0..7
+        for (let x = 0; x < W; x++) {
+          const xm = x > 0 ? x - 1 : 0;
+          const xp = x < W - 1 ? x + 1 : W - 1;
+          const gx = lum[y * W + xp] - lum[y * W + xm];
+          const gy = lum[yp * W + x] - lum[ym * W + x];
+          const mag = Math.sqrt(gx * gx + gy * gy);
+          gradMag[y * W + x] = mag;
+
+          let ang = Math.atan2(gy, gx);
+          if (ang < 0) ang += Math.PI;
+          const bin = Math.min(7, Math.floor((ang / Math.PI) * 8));
+          const cx = x >> 3;
+          hog[(cy * 8 + cx) * 8 + bin] += mag;
+        }
+      }
+
+      // تطبيع HOG مع أرضية ناعمة لمنع تضخيم ضجيج الأسطح المسطحة الفارغة
+      let hogSq = 0;
+      for (let i = 0; i < hog.length; i++) hogSq += hog[i] * hog[i];
+      const hogNorm = Math.sqrt(hogSq + 0.25);
+      for (let i = 0; i < hog.length; i++) hog[i] /= hogNorm;
+
+      // ب) Spatial HSV + Texture: شبكة 3×3 × (8 Hue + 4 Sat + 4 Val + 2 Texture) = 162 ميزة
+      const colTex = new Float32Array(9 * 18);
+      const counts = new Float32Array(9);
+
+      for (let y = 0; y < H; y++) {
+        const by = Math.min(2, Math.floor((y / H) * 3));
+        for (let x = 0; x < W; x++) {
+          const bx = Math.min(2, Math.floor((x / W) * 3));
+          const bIdx = by * 3 + bx;
+          const pIdx = y * W + x;
+          const base = bIdx * 18;
+
+          counts[bIdx]++;
+          const s = satArr[pIdx];
+          const v = valArr[pIdx];
+          colTex[base + hueArr[pIdx]] += s; // ترجيح اللون بالتشبع
+          colTex[base + 8 + Math.min(3, Math.floor(s * 4))] += 1;
+          colTex[base + 12 + Math.min(3, Math.floor(v * 4))] += 1;
+          colTex[base + 16] += gradMag[pIdx]; // كثافة الحواف المحلية
+        }
+      }
+
+      for (let b = 0; b < 9; b++) {
+        const c = counts[b] || 1;
+        const base = b * 18;
+        for (let k = 0; k < 17; k++) colTex[base + k] /= c;
+        // التباين المحلي للإضاءة
+        const y0 = Math.floor((Math.floor(b / 3) * H) / 3);
+        const y1 = Math.floor(((Math.floor(b / 3) + 1) * H) / 3);
+        const x0 = Math.floor(((b % 3) * W) / 3);
+        const x1 = Math.floor((((b % 3) + 1) * W) / 3);
+        let meanL = 0;
+        for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) meanL += lum[y * W + x];
+        meanL /= c;
+        let varL = 0;
+        for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) {
+          const d = lum[y * W + x] - meanL;
+          varL += d * d;
+        }
+        colTex[base + 17] = Math.sqrt(varL / c);
+      }
+
+      let colSq = 0;
+      for (let i = 0; i < colTex.length; i++) colSq += colTex[i] * colTex[i];
+      const colNorm = Math.sqrt(colSq + 0.01);
+      for (let i = 0; i < colTex.length; i++) colTex[i] /= colNorm;
+
+      // دمج موزون: 68% شكل وحواف (HOG) + 32% لون وملمس (HSV+Tex)
+      const totalLen = hog.length + colTex.length; // 674
+      const merged = new Array(totalLen);
+      let mSq = 0;
+      for (let i = 0; i < hog.length; i++) {
+        const val = 0.68 * hog[i];
+        merged[i] = val;
+        mSq += val * val;
+      }
+      for (let i = 0; i < colTex.length; i++) {
+        const val = 0.32 * colTex[i];
+        merged[hog.length + i] = val;
+        mSq += val * val;
+      }
+      const mNorm = Math.sqrt(mSq) || 1;
+      for (let i = 0; i < totalLen; i++) merged[i] = Math.round((merged[i] / mNorm) * 10000) / 10000;
+      return merged;
+    }
+
+    function drawRegionAndExtract(sourceCanvas, sx, sy, sSize) {
+      featCanvas.getContext("2d").drawImage(sourceCanvas, sx, sy, sSize, sSize, 0, 0, 64, 64);
+      const vec = extractClassicalFeatures(featCanvas);
+
+      const fctx = flipCanvas.getContext("2d");
+      fctx.save();
+      fctx.translate(64, 0);
+      fctx.scale(-1, 1);
+      fctx.drawImage(featCanvas, 0, 0);
+      fctx.restore();
+      const flipVec = extractClassicalFeatures(flipCanvas);
+
+      thumbCanvas.getContext("2d").drawImage(featCanvas, 0, 0, 48, 48);
+      const thumb = thumbCanvas.toDataURL("image/jpeg", 0.65);
+
+      return { vec, flipVec, thumb };
+    }
+
+    // =========================================================
+    // 3. حساسات الإضاءة والحركة المحلية (Pure JS)
+    // =========================================================
+    let prevMotionGray = null;
+
+    function analyzeLightAndMotion(sourceCanvas) {
+      const mctx = motionCanvas.getContext("2d", { willReadFrequently: true });
+      mctx.drawImage(sourceCanvas, 0, 0, 32, 32);
+      const d = mctx.getImageData(0, 0, 32, 32).data;
+
+      const gray = new Float32Array(1024);
+      let lumSum = 0;
+      for (let i = 0; i < 1024; i++) {
+        const l = (0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2]) / 255;
+        gray[i] = l;
+        lumSum += l;
+      }
+      const brightness = lumSum / 1024;
+
+      let motionZone = "ثابت";
+      let motionLevel = 0;
+
+      if (prevMotionGray) {
+        // تعويض تغير التعريض الضوئي الكلي للكاميرا
+        let prevSum = 0;
+        for (let i = 0; i < 1024; i++) prevSum += prevMotionGray[i];
+        const exposureShift = brightness - prevSum / 1024;
+
+        let lDiff = 0, cDiff = 0, rDiff = 0;
+        let lCnt = 0, cCnt = 0, rCnt = 0;
+        for (let y = 0; y < 32; y++) {
+          for (let x = 0; x < 32; x++) {
+            const idx = y * 32 + x;
+            const diff = Math.abs((gray[idx] - exposureShift) - prevMotionGray[idx]);
+            if (x < 11) { lDiff += diff; lCnt++; }
+            else if (x < 21) { cDiff += diff; cCnt++; }
+            else { rDiff += diff; rCnt++; }
+          }
+        }
+        const mL = lDiff / lCnt, mC = cDiff / cCnt, mR = rDiff / rCnt;
+        motionLevel = Math.max(mL, mC, mR);
+
+        if (motionLevel > 0.085) {
+          if (mC >= mL && mC >= mR) motionZone = "حركة أمامك";
+          else if (mL > mR) motionZone = "حركة يساراً";
+          else motionZone = "حركة يميناً";
+        }
+      }
+      prevMotionGray = gray;
+
+      let lightLabel = "جيدة";
+      if (brightness < 0.09) lightLabel = "ظلام / مغطاة";
+      else if (brightness < 0.22) lightLabel = "خافتة";
+      else if (brightness > 0.85) lightLabel = "ساطعة جداً";
+
+      return { brightness, lightLabel, motionZone, motionLevel };
+    }
+
+    // =========================================================
+    // 4. محرك فهم اللغة العربية المحلي (بدون أي نماذج لغوية خارجية)
+    // =========================================================
+    function normalizeAr(text) {
+      return (text || "")
+        .toLowerCase()
+        .replace(/[\u064B-\u065F\u0670\u0640]/g, "")
+        .replace(/[أإآ]/g, "ا")
+        .replace(/ى/g, "ي")
+        .replace(/ة/g, "ه")
+        .replace(/[^\p{L}\p{N}\s]/gu, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function stemAr(word) {
+      let w = normalizeAr(word);
+      if (w.length > 3 && w.startsWith("ال")) w = w.slice(2);
+      else if (w.length > 4 && /^[وبلفك]ال/.test(w)) w = w.slice(3);
+      else if (w.length > 3 && /^[وبلف]/.test(w)) w = w.slice(1);
+      if (w.length > 4) w = w.replace(/(اتي|ات|ين|ون|كم|هم|ها|ني|تي)$/, "");
+      if (w.length > 3) w = w.replace(/[يهك]$/, "");
+      return w;
+    }
+
+    function diceSimilarity(a, b) {
+      if (!a || !b) return 0;
+      if (a === b) return 1;
+      if (a.length < 2 || b.length < 2) return a === b ? 1 : 0;
+      const bgA = new Map();
+      for (let i = 0; i < a.length - 1; i++) {
+        const bg = a.slice(i, i + 2);
+        bgA.set(bg, (bgA.get(bg) || 0) + 1);
+      }
+      let hits = 0;
+      for (let i = 0; i < b.length - 1; i++) {
+        const bg = b.slice(i, i + 2);
+        const c = bgA.get(bg) || 0;
+        if (c > 0) { hits++; bgA.set(bg, c - 1); }
+      }
+      return (2 * hits) / (a.length + b.length - 2);
+    }
+
+    const INTENT_RULES = {
+      READ_TEXT: {
+        label: "قراءة نص أو لافتة",
+        phrases: ["اقرا", "قراءه", "مكتوب", "يافطه", "لافته", "لوحه", "ورقه", "كلام", "عنوان"]
+      },
+      LIGHT_CHECK: {
+        label: "فحص الإضاءة",
+        phrases: ["نور", "منور", "مظلم", "ظلام", "ضلمه", "اضاءه", "ظلمه", "لمبه", "مغطاه"]
+      },
+      MOTION_CHECK: {
+        label: "فحص الحركة والاقتراب",
+        phrases: ["حركه", "بيتحرك", "يتحرك", "حد ماشي", "حد جاي", "اقتراب", "يمشي"]
+      },
+      LIST_CLASSES: {
+        label: "عرض المعرفة المدرَّبة",
+        phrases: ["متدرب علي", "تعرف ايه", "الفئات", "ايه اللي تعرفه", "ذاكرتك"]
+      },
+      FIND_OBJECT: {
+        label: "البحث عن فئة وتحديد موقعها",
+        phrases: [
+          "اين", "فين", "وين", "مكان", "موقع", "ابحث", "بدور", "ضاع", "مضيع",
+          "شايف", "موجود", "يوجد", "هل في", "فيه", "عثر", "القي", "يمين", "شمال", "يسار"
+        ]
+      },
+      SAFETY_CHECK: {
+        label: "فحص الأمان والمخاطر",
+        phrases: ["امان", "امن", "خطر", "خطير", "حفر", "نار", "حريق", "مطب", "عائق", "اصطدم", "سليم", "امشي", "سلالم", "درج"]
+      },
+      DESCRIBE_SCENE: {
+        label: "وصف المشهد والمحيط",
+        phrases: ["وصف", "صف", "اوصف", "مشهد", "صوره", "امامي", "قدامي", "حولي", "ماذا تري", "شايف ايه", "المكان", "الشارع"]
+      }
+    };
+
+    function findTargetClassInQuestion(question) {
+      const normQ = normalizeAr(question);
+      const qWords = normQ.split(" ").filter(Boolean);
+      const qStems = qWords.map(stemAr);
+
+      let best = null;
+      let bestScore = 0;
+
+      for (const cls of classes) {
+        if (cls.isBg) continue;
+        const cNorm = normalizeAr(cls.name);
+        const cStem = stemAr(cls.name);
+
+        if (normQ.includes(cNorm)) return { classObj: cls, score: 1.0 };
+
+        for (let i = 0; i < qWords.length; i++) {
+          if (qWords[i].length < 2) continue;
+          const sc = Math.max(
+            diceSimilarity(qWords[i], cNorm),
+            diceSimilarity(qStems[i], cStem),
+            qStems[i] === cStem ? 0.96 : 0
+          );
+          if (sc > bestScore && sc >= 0.72) {
+            bestScore = sc;
+            best = { classObj: cls, score: sc };
+          }
+        }
+      }
+      return best;
+    }
+
+    function parseArabicQuestion(question) {
+      const normQ = normalizeAr(question);
+      const qStems = normQ.split(" ").filter(Boolean).map(stemAr);
+      const entity = findTargetClassInQuestion(question);
+
+      const scores = {};
+      for (const k of Object.keys(INTENT_RULES)) scores[k] = 0;
+      scores.DESCRIBE_SCENE = 0.2;
+
+      for (const [intent, data] of Object.entries(INTENT_RULES)) {
+        for (const ph of data.phrases) {
+          const phNorm = normalizeAr(ph);
+          const phStem = stemAr(ph);
+          if (normQ.includes(phNorm)) {
+            scores[intent] += phNorm.includes(" ") ? 2.2 : 1.5;
+          } else {
+            for (const st of qStems) {
+              if (st.length < 2) continue;
+              const sim = diceSimilarity(st, phStem);
+              if (sim >= 0.78) scores[intent] += sim;
+            }
+          }
+        }
+      }
+
+      if (entity && scores.READ_TEXT < 1.2) scores.FIND_OBJECT += 1.4;
+
+      let bestIntent = "DESCRIBE_SCENE";
+      let bestVal = -1;
+      for (const [k, v] of Object.entries(scores)) {
+        if (v > bestVal) { bestVal = v; bestIntent = k; }
+      }
+      return { intent: bestIntent, intentLabel: INTENT_RULES[bestIntent].label, entity };
+    }
+
+    // =========================================================
+    // 5. المصنّف المحلي المتعدد الفئات (Balanced L2-Softmax + Cosine KNN)
+    // =========================================================
+    let classes = []; // { id, name, isDanger, isBg }
+    let samples = []; // { id, classId, vec, flipVec, thumb }
+    let linearHead = null;
+
+    function dot(a, b) {
+      let s = 0;
+      for (let i = 0; i < a.length; i++) s += a[i] * b[i];
+      return s;
+    }
+
+    function softmaxInto(logits, out) {
+      let max = -Infinity;
+      for (let i = 0; i < logits.length; i++) if (logits[i] > max) max = logits[i];
+      let sum = 0;
+      for (let i = 0; i < logits.length; i++) {
+        out[i] = Math.exp(logits[i] - max);
+        sum += out[i];
+      }
+      for (let i = 0; i < logits.length; i++) out[i] /= sum;
+    }
+
+    function retrainLinearHead() {
+      const counts = {};
+      for (const c of classes) counts[c.id] = 0;
+      for (const s of samples) if (counts[s.classId] !== undefined) counts[s.classId]++;
+
+      const activeClasses = classes.filter(c => counts[c.id] > 0);
+      if (activeClasses.length < 2) {
+        linearHead = activeClasses.length === 1 ? { activeClasses, W: null, b: null } : null;
+        return;
+      }
+
+      const C = activeClasses.length;
+      const idToIdx = {};
+      activeClasses.forEach((c, idx) => idToIdx[c.id] = idx);
+
+      const trainItems = [];
+      for (const s of samples) {
+        const idx = idToIdx[s.classId];
+        if (idx === undefined) continue;
+        const w = 1 / (C * counts[s.classId]);
+        trainItems.push({ idx, vec: s.vec, weight: w });
+        if (s.flipVec) trainItems.push({ idx, vec: s.flipVec, weight: w });
+      }
+      let totalW = 0;
+      for (const it of trainItems) totalW += it.weight;
+      for (const it of trainItems) it.weight /= totalW;
+
+      const D = trainItems[0].vec.length;
+      const W = Array.from({ length: C }, () => new Float32Array(D));
+      const b = new Float32Array(C);
+      const gradW = Array.from({ length: C }, () => new Float32Array(D));
+      const gradB = new Float32Array(C);
+      const logits = new Float64Array(C);
+      const probs = new Float64Array(C);
+
+      const epochs = trainItems.length > 200 ? 45 : 80;
+      const lr = 1.3;
+      const reg = 0.004;
+
+      for (let ep = 0; ep < epochs; ep++) {
+        for (let c = 0; c < C; c++) { gradW[c].fill(0); gradB[c] = 0; }
+        for (let n = 0; n < trainItems.length; n++) {
+          const item = trainItems[n];
+          const x = item.vec;
+          for (let c = 0; c < C; c++) logits[c] = b[c] + dot(W[c], x);
+          softmaxInto(logits, probs);
+          for (let c = 0; c < C; c++) {
+            const diff = (probs[c] - (c === item.idx ? 1 : 0)) * item.weight;
+            gradB[c] += diff;
+            const gW = gradW[c];
+            for (let j = 0; j < D; j++) gW[j] += diff * x[j];
+          }
+        }
+        for (let c = 0; c < C; c++) {
+          b[c] -= lr * gradB[c];
+          const wc = W[c], gwc = gradW[c];
+          for (let j = 0; j < D; j++) wc[j] -= lr * (gwc[j] + reg * wc[j]);
+        }
+      }
+      linearHead = { activeClasses, W, b };
+    }
+
+    function classifyRegion(sx, sy, sSize) {
+      if (!linearHead || linearHead.activeClasses.length === 0) return null;
+      featCanvas.getContext("2d").drawImage(workCanvas, sx, sy, sSize, sSize, 0, 0, 64, 64);
+      const vec = extractClassicalFeatures(featCanvas);
+
+      const active = linearHead.activeClasses;
+      const C = active.length;
+      const maxSims = new Array(C).fill(0);
+      const topKMeans = new Array(C).fill(0);
+
+      for (let c = 0; c < C; c++) {
+        const cid = active[c].id;
+        const sims = [];
+        for (const s of samples) {
+          if (s.classId !== cid) continue;
+          sims.push(dot(vec, s.vec));
+          if (s.flipVec) sims.push(dot(vec, s.flipVec));
+        }
+        sims.sort((a, b) => b - a);
+        maxSims[c] = sims[0] || 0;
+        const k = Math.min(3, sims.length);
+        let sum = 0;
+        for (let i = 0; i < k; i++) sum += sims[i];
+        topKMeans[c] = k > 0 ? sum / k : 0;
+      }
+
+      const probs = new Float64Array(C);
+      if (C === 1) {
+        probs[0] = 1;
+      } else {
+        const linLogits = new Float64Array(C), pLin = new Float64Array(C);
+        const knnLogits = new Float64Array(C), pKnn = new Float64Array(C);
+        for (let c = 0; c < C; c++) {
+          linLogits[c] = linearHead.b[c] + dot(linearHead.W[c], vec);
+          knnLogits[c] = topKMeans[c] * 20;
+        }
+        softmaxInto(linLogits, pLin);
+        softmaxInto(knnLogits, pKnn);
+        for (let c = 0; c < C; c++) probs[c] = 0.45 * pLin[c] + 0.55 * pKnn[c];
+      }
+
+      let winIdx = 0;
+      for (let c = 1; c < C; c++) if (probs[c] > probs[winIdx]) winIdx = c;
+
+      return {
+        classObj: active[winIdx],
+        prob: probs[winIdx],
+        maxSim: maxSims[winIdx],
+        allSims: Object.fromEntries(active.map((c, i) => [c.id, maxSims[i]])),
+        allProbs: Object.fromEntries(active.map((c, i) => [c.id, probs[i]]))
+      };
+    }
+
+    function scanThreeZones(w, h) {
+      const side = Math.min(w, h);
+      const y = Math.floor((h - side) / 2);
+      const zones = [
+        { key: "left", label: "على يسارك", x: 0, y, size: side },
+        { key: "center", label: "أمامك مباشرة", x: Math.floor((w - side) / 2), y, size: side },
+        { key: "right", label: "على يمينك", x: Math.max(0, w - side), y, size: side }
+      ];
+
+      const oodThreshold = Number(oodRange.value) / 100;
+      const confThreshold = Number(confRange.value) / 100;
+
+      return zones.map(z => {
+        const res = classifyRegion(z.x, z.y, z.size);
+        const accepted = res && !res.classObj.isBg && res.maxSim >= oodThreshold && (linearHead.activeClasses.length === 1 || res.prob >= confThreshold);
+        return { zone: z, res, accepted };
+      });
+    }
+
+    // =========================================================
+    // 6. عناصر الواجهة والكاميرا والصوت
     // =========================================================
     const video = document.getElementById("video");
     const snapshotCanvas = document.getElementById("snapshotCanvas");
+    const overlayCanvas = document.getElementById("overlayCanvas");
     const placeholder = document.getElementById("placeholder");
-    const cropGuide = document.getElementById("cropGuide");
-    const cropCanvas = document.getElementById("cropCanvas");
-    const flipCanvas = document.getElementById("flipCanvas");
-    const thumbCanvas = document.getElementById("thumbCanvas");
 
-    const statusDot = document.getElementById("statusDot");
-    const statusText = document.getElementById("statusText");
+    const lightSensorVal = document.getElementById("lightSensorVal");
+    const motionSensorVal = document.getElementById("motionSensorVal");
+    const speedSensorVal = document.getElementById("speedSensorVal");
 
     const startCamBtn = document.getElementById("startCamBtn");
     const switchCamBtn = document.getElementById("switchCamBtn");
     const backToCamBtn = document.getElementById("backToCamBtn");
     const testImageUpload = document.getElementById("testImageUpload");
     const voiceBtn = document.getElementById("voiceBtn");
-    const testBtn = document.getElementById("testBtn");
+    const describeBtn = document.getElementById("describeBtn");
+    const safetyBtn = document.getElementById("safetyBtn");
     const liveBtn = document.getElementById("liveBtn");
 
-    const oodRange = document.getElementById("oodRange");
-    const oodVal = document.getElementById("oodVal");
-    const confRange = document.getElementById("confRange");
-    const confVal = document.getElementById("confVal");
+    const micBtn = document.getElementById("micBtn");
+    const questionInput = document.getElementById("questionInput");
+    const askBtn = document.getElementById("askBtn");
+    const answerBox = document.getElementById("answerBox");
 
     const newClassInput = document.getElementById("newClassInput");
     const addClassBtn = document.getElementById("addClassBtn");
@@ -695,38 +927,28 @@
     const classesListEl = document.getElementById("classesList");
     const totalSamplesBadge = document.getElementById("totalSamplesBadge");
 
+    const oodRange = document.getElementById("oodRange");
+    const oodVal = document.getElementById("oodVal");
+    const confRange = document.getElementById("confRange");
+    const confVal = document.getElementById("confVal");
+
     const exportBtn = document.getElementById("exportBtn");
     const importModelInput = document.getElementById("importModelInput");
     const resetAllBtn = document.getElementById("resetAllBtn");
-    const resultBox = document.getElementById("resultBox");
     const logBox = document.getElementById("logBox");
 
-    let mobilenetModel = null;
     let stream = null;
     let facingMode = "environment";
     let hasUploadedSource = false;
-
     let isLiveMode = false;
     let liveTimer = null;
-    let isBusy = false;
     let cancelBatchFlag = false;
 
-    // الصوت والتنبيهات
     let voiceEnabled = true;
     let audioCtx = null;
     let arVoice = null;
-    let lastSpokenClass = "";
-    let lastSpokenTime = 0;
-    let stableCandidate = "";
-    let stableCount = 0;
-
-    /**
-     * classes: Array<{ id: string, name: string, isDanger: boolean }>
-     * samples: Array<{ id: string, classId: string, vec: number[], flipVec: number[]|null, thumb: string }>
-     */
-    let classes = [];
-    let samples = [];
-    let linearHead = null; // { activeClasses: ClassObj[], W: Float32Array[], b: Float32Array }
+    let lastLiveKey = "";
+    let lastLiveTime = 0;
 
     function log(msg) {
       const time = new Date().toLocaleTimeString("ar-EG");
@@ -734,23 +956,17 @@
     }
 
     function isLikelyDanger(name) {
-      return /نار|حريق|حفر|مطب|كهرب|خطر|هابط|سيار|شارع|عائق|زجاج|ماء|بركة|مكسور|fire|hole|danger|stairs/i.test(name);
+      return /نار|حريق|حفر|مطب|كهرب|خطر|هابط|سيار|شارع|عائق|زجاج|ماء|بركة|مكسور|كلب|fire|hole|danger|stairs/i.test(name);
     }
 
-    function roundVec(arr) {
-      const out = new Array(arr.length);
-      for (let i = 0; i < arr.length; i++) out[i] = Math.round(arr[i] * 10000) / 10000;
-      return out;
+    function isLikelyBg(name) {
+      return /خال|خلف|فراغ|فارغ|جدار|حيط|ارض|طريق خال|background|empty/i.test(name);
     }
 
-    // =========================================================
-    // 3. تهيئة الصوت والتنبيه التحذيري العربي
-    // =========================================================
     function loadVoices() {
       if (!("speechSynthesis" in window)) return;
       const voices = window.speechSynthesis.getVoices();
-      arVoice = voices.find(v => v.lang.startsWith("ar-EG")) ||
-                voices.find(v => v.lang.startsWith("ar")) || null;
+      arVoice = voices.find(v => v.lang.startsWith("ar-EG")) || voices.find(v => v.lang.startsWith("ar")) || null;
     }
     if ("speechSynthesis" in window) {
       loadVoices();
@@ -770,7 +986,7 @@
         initAudio();
         if (!audioCtx) return;
         const now = audioCtx.currentTime;
-        [880, 1100].forEach((freq, idx) => {
+        [880, 1140].forEach((freq, idx) => {
           const osc = audioCtx.createOscillator();
           const gain = audioCtx.createGain();
           osc.type = "triangle";
@@ -786,15 +1002,13 @@
     }
 
     function speakArabic(text, isDanger = false) {
-      if (!voiceEnabled || !("speechSynthesis" in window)) return;
+      if (!voiceEnabled || !("speechSynthesis" in window) || !text) return;
       if (isDanger) playDangerBeep();
-
       window.speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(text);
       u.lang = arVoice ? arVoice.lang : "ar-SA";
       if (arVoice) u.voice = arVoice;
-      u.rate = isDanger ? 1.08 : 1.0;
-      u.pitch = isDanger ? 1.1 : 1.0;
+      u.rate = isDanger ? 1.06 : 1.0;
       setTimeout(() => window.speechSynthesis.speak(u), isDanger ? 180 : 0);
     }
 
@@ -802,52 +1016,41 @@
       initAudio();
       voiceEnabled = !voiceEnabled;
       voiceBtn.classList.toggle("active", voiceEnabled);
-      voiceBtn.textContent = voiceEnabled ? "🔊 الصوت: مفعّل" : "🔇 الصوت: صامت";
+      voiceBtn.textContent = voiceEnabled ? "🔊 النطق: مفعّل" : "🔇 النطق: صامت";
       if (!voiceEnabled && "speechSynthesis" in window) window.speechSynthesis.cancel();
     });
 
-    // =========================================================
-    // 4. تحميل MobileNet v2
-    // =========================================================
-    async function initMobileNet() {
-      try {
-        statusDot.className = "dot";
-        statusText.textContent = "جاري تحميل MobileNet v2...";
-        mobilenetModel = await mobilenet.load({ version: 2, alpha: 1.0 });
-
-        const ctx = cropCanvas.getContext("2d");
-        ctx.fillStyle = "#000";
-        ctx.fillRect(0, 0, 224, 224);
-        const t = mobilenetModel.infer(cropCanvas, true);
-        await t.data();
-        t.dispose();
-
-        statusDot.className = "dot ready";
-        statusText.textContent = "جاهز للتدريب والتشغيل";
-        testBtn.disabled = false;
-        liveBtn.disabled = false;
-        log("تم تحميل MobileNet v2 بنجاح.");
-
-        const saved = await dbLoad();
-        if (saved && Array.isArray(saved.classes)) {
-          classes = saved.classes;
-          samples = saved.samples || [];
-          retrainLinearHead();
-          renderClassesUI();
-          log(`تمت استعادة ${classes.length} فئات و ${samples.length} صورة من الذاكرة المحلية.`);
-        } else {
-          renderClassesUI();
-        }
-      } catch (err) {
-        statusDot.className = "dot error";
-        statusText.textContent = "تعذر تحميل النموذج";
-        log(`خطأ في التحميل: ${err.message}`);
-      }
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    if (SpeechRec) {
+      recognition = new SpeechRec();
+      recognition.lang = "ar-EG";
+      recognition.interimResults = false;
+      recognition.onstart = () => {
+        if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+        micBtn.classList.add("listening");
+        micBtn.textContent = "🎙️ أستمع إليك...";
+      };
+      recognition.onend = () => {
+        micBtn.classList.remove("listening");
+        micBtn.textContent = "🎤 اسأل بصوتك";
+      };
+      recognition.onresult = (e) => {
+        const txt = e.results[0][0].transcript;
+        questionInput.value = txt;
+        handleUserQuestion(txt);
+      };
     }
 
-    // =========================================================
-    // 5. الكاميرا واستخراج الميزات
-    // =========================================================
+    micBtn.addEventListener("click", () => {
+      initAudio();
+      if (!recognition) {
+        alert("متصفحك لا يدعم الإملاء الصوتي المباشر؛ استخدم Chrome أو Edge أو اكتب سؤالك.");
+        return;
+      }
+      try { recognition.start(); } catch (e) {}
+    });
+
     async function startCamera() {
       initAudio();
       try {
@@ -857,11 +1060,12 @@
           audio: false
         });
         video.srcObject = stream;
+        prevMotionGray = null;
         showCameraView();
         switchCamBtn.disabled = false;
-        log("تم تشغيل الكاميرا.");
+        log("تم تشغيل الكاميرا بنجاح.");
       } catch (err) {
-        alert("تعذر فتح الكاميرا. تأكد من الصلاحية أو استخدم رفع صورة.");
+        alert("تعذر فتح الكاميرا. تأكد من الصلاحية أو ارفع صورة.");
       }
     }
 
@@ -870,8 +1074,8 @@
       snapshotCanvas.style.display = "none";
       placeholder.style.display = "none";
       video.style.display = "block";
-      cropGuide.style.display = "flex";
       backToCamBtn.style.display = "none";
+      clearOverlay();
     }
 
     startCamBtn.addEventListener("click", startCamera);
@@ -895,11 +1099,12 @@
           video.style.display = "none";
           placeholder.style.display = "none";
           snapshotCanvas.style.display = "block";
-          cropGuide.style.display = "flex";
           hasUploadedSource = true;
+          prevMotionGray = null;
           if (stream) backToCamBtn.style.display = "inline-flex";
+          clearOverlay();
           log(`تم تحميل صورة الاختبار: ${file.name}`);
-          testCurrentFrame(false);
+          handleUserQuestion("وصفلي ايه اللي قدامي؟");
         };
         img.src = ev.target.result;
       };
@@ -907,242 +1112,373 @@
       testImageUpload.value = "";
     });
 
-    function getActiveVisualSource() {
+    function getActiveSource() {
       if (hasUploadedSource && snapshotCanvas.width > 0) return snapshotCanvas;
       if (video.srcObject && video.readyState >= 2) return video;
       return null;
     }
 
-    function drawCenterCropTo224(source, makeThumb = true) {
-      const sw = source instanceof HTMLVideoElement ? source.videoWidth : source.width;
-      const sh = source instanceof HTMLVideoElement ? source.videoHeight : source.height;
-      const side = Math.min(sw, sh);
-      const sx = (sw - side) / 2;
-      const sy = (sh - side) / 2;
-      cropCanvas.getContext("2d").drawImage(source, sx, sy, side, side, 0, 0, 224, 224);
-
-      if (!makeThumb) return "";
-      thumbCanvas.getContext("2d").drawImage(cropCanvas, 0, 0, 48, 48);
-      return thumbCanvas.toDataURL("image/jpeg", 0.65);
+    function captureToWorkCanvas(source) {
+      const w = source instanceof HTMLVideoElement ? source.videoWidth : source.width;
+      const h = source instanceof HTMLVideoElement ? source.videoHeight : source.height;
+      workCanvas.width = w;
+      workCanvas.height = h;
+      workCanvas.getContext("2d").drawImage(source, 0, 0, w, h);
+      return { w, h };
     }
 
-    async function extractEmbedding(canvasEl) {
-      const tensor = mobilenetModel.infer(canvasEl, true);
-      try {
-        const raw = await tensor.data();
-        let normSq = 0;
-        for (let i = 0; i < raw.length; i++) normSq += raw[i] * raw[i];
-        const norm = Math.sqrt(normSq) || 1;
-        const vec = new Array(raw.length);
-        for (let i = 0; i < raw.length; i++) vec[i] = Math.round((raw[i] / norm) * 10000) / 10000;
-        return vec;
-      } finally {
-        tensor.dispose();
+    function clearOverlay() {
+      overlayCanvas.getContext("2d").clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+    }
+
+    function drawZoneBoxes(w, h, highlights) {
+      overlayCanvas.width = w;
+      overlayCanvas.height = h;
+      const ctx = overlayCanvas.getContext("2d");
+      ctx.clearRect(0, 0, w, h);
+      ctx.font = `bold ${Math.max(13, Math.round(w / 38))}px Tahoma, Arial`;
+
+      for (const hl of highlights) {
+        const color = hl.isDanger ? "#ef4444" : "#22c55e";
+        ctx.save();
+        ctx.setLineDash([8, 6]);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = Math.max(3, Math.round(w / 180));
+        ctx.strokeRect(hl.x + 3, hl.y + 3, hl.w - 6, hl.h - 6);
+        const tw = ctx.measureText(hl.label).width + 14;
+        ctx.fillStyle = color;
+        ctx.fillRect(hl.x + 3, hl.y + 4, tw, 24);
+        ctx.fillStyle = "#fff";
+        ctx.fillText(hl.label, hl.x + 10, hl.y + 21);
+        ctx.restore();
       }
-    }
-
-    async function extractFlippedEmbedding() {
-      const fctx = flipCanvas.getContext("2d");
-      fctx.save();
-      fctx.translate(224, 0);
-      fctx.scale(-1, 1);
-      fctx.drawImage(cropCanvas, 0, 0);
-      fctx.restore();
-      return extractEmbedding(flipCanvas);
     }
 
     // =========================================================
-    // 6. محرك التصنيف متعدد الفئات (Balanced L2-Softmax + Top-K KNN + OOD)
+    // 7. منطق الإجابة الذكية على الأسئلة
     // =========================================================
-    function dot(a, b) {
-      let s = 0;
-      for (let i = 0; i < a.length; i++) s += a[i] * b[i];
-      return s;
+    function showAnswer(intentLabel, text, isDanger = false, speakNow = true) {
+      answerBox.innerHTML = `
+        <div class="intent-tag">🧠 ${intentLabel}</div>
+        <div class="answer-text" style="color:${isDanger ? "var(--danger)" : "var(--text)"};">${text}</div>
+      `;
+      if (speakNow) speakArabic(text, isDanger);
     }
 
-    function softmaxInto(logits, out) {
-      let max = -Infinity;
-      for (let i = 0; i < logits.length; i++) if (logits[i] > max) max = logits[i];
-      let sum = 0;
-      for (let i = 0; i < logits.length; i++) {
-        out[i] = Math.exp(logits[i] - max);
-        sum += out[i];
-      }
-      for (let i = 0; i < logits.length; i++) out[i] /= sum;
-    }
+    function handleUserQuestion(rawQuestion, isLiveSilent = false) {
+      const t0 = performance.now();
+      const parsed = parseArabicQuestion(rawQuestion);
 
-    function retrainLinearHead() {
-      const countByClass = {};
-      for (const c of classes) countByClass[c.id] = 0;
-      for (const s of samples) {
-        if (countByClass[s.classId] !== undefined) countByClass[s.classId]++;
-      }
-
-      const activeClasses = classes.filter(c => countByClass[c.id] > 0);
-      if (activeClasses.length < 2) {
-        linearHead = activeClasses.length === 1 ? { activeClasses, W: null, b: null } : null;
+      // أسئلة لا تحتاج صورة أولاً (معرفة النظام)
+      if (parsed.intent === "LIST_CLASSES") {
+        const names = classes.filter(c => !c.isBg && samples.some(s => s.classId === c.id)).map(c => c.name);
+        const msg = names.length > 0
+          ? `أنا مدرَّب حالياً على التمييز بين: ${names.join("، و")}.`
+          : "لم يتم تدريبي على أي فئات بعد؛ أضف صوراً أو مجلدات من القسم المقابل.";
+        showAnswer(parsed.intentLabel, msg, false);
         return;
       }
 
-      const C = activeClasses.length;
-      const idToIdx = {};
-      activeClasses.forEach((c, idx) => idToIdx[c.id] = idx);
-
-      const trainItems = [];
-      for (const s of samples) {
-        const idx = idToIdx[s.classId];
-        if (idx === undefined) continue;
-        const w = 1 / (C * countByClass[s.classId]);
-        trainItems.push({ idx, vec: s.vec, weight: w });
-        if (s.flipVec) trainItems.push({ idx, vec: s.flipVec, weight: w });
+      if (parsed.intent === "READ_TEXT") {
+        const msg = "هذا الوضع يعمل محلياً 100% بدون أي نموذج خارجي، لذلك لا يمكن قراءة النصوص العشوائية (OCR)؛ لكن يمكنني وصف الفئات المدرَّبة، وتحديد اتجاهها، وفحص الإضاءة والحركة.";
+        showAnswer(parsed.intentLabel, msg, false);
+        return;
       }
 
-      let totalW = 0;
-      for (const it of trainItems) totalW += it.weight;
-      for (const it of trainItems) it.weight /= totalW;
+      const source = getActiveSource();
+      if (!source) {
+        if (!isLiveSilent) alert("شغّل الكاميرا أو ارفع صورة أولاً.");
+        return;
+      }
 
-      const D = trainItems[0].vec.length;
-      const W = Array.from({ length: C }, () => new Float32Array(D));
-      const b = new Float32Array(C);
-      const gradW = Array.from({ length: C }, () => new Float32Array(D));
-      const gradB = new Float32Array(C);
-      const logits = new Float64Array(C);
-      const probs = new Float64Array(C);
+      const { w, h } = captureToWorkCanvas(source);
+      const sensors = analyzeLightAndMotion(workCanvas);
+      lightSensorVal.textContent = sensors.lightLabel;
+      motionSensorVal.textContent = sensors.motionZone;
 
-      const epochs = trainItems.length > 200 ? 40 : 75;
-      const lr = 1.25;
-      const reg = 0.004;
+      if (parsed.intent === "LIGHT_CHECK") {
+        clearOverlay();
+        const msg = sensors.brightness < 0.09
+          ? "المكان مظلم جداً أو أن عدسة الكاميرا مغطاة."
+          : `الإضاءة أمامك ${sensors.lightLabel}.`;
+        showAnswer(parsed.intentLabel, msg, sensors.brightness < 0.09);
+        speedSensorVal.textContent = `${Math.round(performance.now() - t0)} ms`;
+        return;
+      }
 
-      for (let ep = 0; ep < epochs; ep++) {
-        for (let c = 0; c < C; c++) {
-          gradW[c].fill(0);
-          gradB[c] = 0;
+      if (parsed.intent === "MOTION_CHECK") {
+        clearOverlay();
+        const msg = sensors.motionZone === "ثابت"
+          ? "لا توجد حركة واضحة أمامك الآن."
+          : `انتبه، أرصد ${sensors.motionZone}.`;
+        showAnswer(parsed.intentLabel, msg, sensors.motionZone !== "ثابت");
+        speedSensorVal.textContent = `${Math.round(performance.now() - t0)} ms`;
+        return;
+      }
+
+      const hasModel = linearHead && linearHead.activeClasses.length > 0;
+      const zonesRes = hasModel ? scanThreeZones(w, h) : [];
+
+      // البحث عن فئة محددة في 3 مناطق (يسار / أمامك / يمين)
+      if (parsed.intent === "FIND_OBJECT") {
+        if (!hasModel) {
+          showAnswer(parsed.intentLabel, "لم يتم تدريبي على فئات بعد.", false);
+          return;
         }
-        for (let n = 0; n < trainItems.length; n++) {
-          const item = trainItems[n];
-          const x = item.vec;
-          for (let c = 0; c < C; c++) logits[c] = b[c] + dot(W[c], x);
-          softmaxInto(logits, probs);
+        if (parsed.entity) {
+          const target = parsed.entity.classObj;
+          const oodThreshold = Number(oodRange.value) / 100;
+          let bestHit = null;
+          let bestScore = 0;
 
-          for (let c = 0; c < C; c++) {
-            const diff = (probs[c] - (c === item.idx ? 1 : 0)) * item.weight;
-            gradB[c] += diff;
-            const gW = gradW[c];
-            for (let j = 0; j < D; j++) gW[j] += diff * x[j];
+          for (const zr of zonesRes) {
+            if (!zr.res) continue;
+            const sim = zr.res.allSims[target.id] || 0;
+            const prob = zr.res.allProbs[target.id] || 0;
+            const ok = (zr.res.classObj.id === target.id || prob >= 0.4) && sim >= oodThreshold;
+            if (ok && sim > bestScore) {
+              bestScore = sim;
+              bestHit = zr;
+            }
+          }
+
+          if (bestHit) {
+            drawZoneBoxes(w, h, [{
+              x: bestHit.zone.x, y: bestHit.zone.y, w: bestHit.zone.size, h: bestHit.zone.size,
+              label: `${target.name} (${bestHit.zone.label})`, isDanger: target.isDanger
+            }]);
+            const msg = `نعم، أرى ${target.name} ${bestHit.zone.label} (تشابه ${Math.round(bestScore * 100)}%).`;
+            showAnswer(`${parsed.intentLabel} ← ${target.name}`, msg, target.isDanger);
+          } else {
+            clearOverlay();
+            showAnswer(`${parsed.intentLabel} ← ${target.name}`, `لا أرى ${target.name} في هذا الاتجاه الآن؛ حرّك الكاميرا يميناً أو يساراً.`, false);
+          }
+          speedSensorVal.textContent = `${Math.round(performance.now() - t0)} ms`;
+          return;
+        }
+      }
+
+      // فحص الأمان أو وصف المشهد
+      const detected = [];
+      const seenClasses = new Set();
+      const highlights = [];
+      let hasDanger = false;
+
+      // نعطي أولوية للمنطقة الوسطى أولاً ثم اليسار واليمين
+      const ordered = [zonesRes[1], zonesRes[0], zonesRes[2]].filter(Boolean);
+      for (const zr of ordered) {
+        if (!zr.accepted) continue;
+        const cls = zr.res.classObj;
+        const pct = Math.round(zr.res.prob * 100);
+        highlights.push({
+          x: zr.zone.x, y: zr.zone.y, w: zr.zone.size, h: zr.zone.size,
+          label: `${cls.name} ${pct}%`, isDanger: cls.isDanger
+        });
+        if (!seenClasses.has(cls.id)) {
+          seenClasses.add(cls.id);
+          if (cls.isDanger) hasDanger = true;
+          detected.push({ cls, zoneLabel: zr.zone.label, pct });
+        }
+      }
+      drawZoneBoxes(w, h, highlights);
+
+      if (parsed.intent === "SAFETY_CHECK") {
+        const dangers = detected.filter(d => d.cls.isDanger);
+        let msg = "";
+        if (dangers.length > 0) {
+          msg = "تحذير! " + dangers.map(d => `يوجد ${d.cls.name} ${d.zoneLabel}`).join("، و") + ".";
+          hasDanger = true;
+        } else if (sensors.brightness < 0.09) {
+          msg = "تنبيه: المكان مظلم جداً ولا يمكن التأكد من خلو الطريق.";
+          hasDanger = true;
+        } else if (sensors.motionZone !== "ثابت") {
+          msg = `لم أرصد مخاطر مدرَّبة، لكن هناك ${sensors.motionZone}.`;
+        } else {
+          msg = hasModel ? "الطريق أمامك يبدو آمناً من المخاطر المدرَّبة." : "لم تدرّب فئات مخاطر بعد؛ الإضاءة حالياً " + sensors.lightLabel + ".";
+        }
+        showAnswer(parsed.intentLabel, msg, hasDanger);
+        speedSensorVal.textContent = `${Math.round(performance.now() - t0)} ms`;
+        return;
+      }
+
+      // الوصف الشامل للمشهد (DESCRIBE_SCENE)
+      const sentences = [];
+      if (sensors.brightness < 0.09) {
+        sentences.push("الإضاءة منعدمة أو الكاميرا مغطاة");
+        hasDanger = true;
+      } else {
+        if (detected.length > 0) {
+          for (const d of detected) {
+            sentences.push(d.cls.isDanger ? `تحذير، ${d.cls.name} ${d.zoneLabel}` : `أرى ${d.cls.name} ${d.zoneLabel}`);
+          }
+        } else {
+          sentences.push(hasModel ? "لا أرى أياً من الفئات المدرَّبة أمامك، الطريق يبدو خالياً" : "لم يتم تدريب فئات بعد");
+        }
+        if (sensors.motionZone !== "ثابت") sentences.push(`وهناك ${sensors.motionZone}`);
+        if (sensors.brightness < 0.22) sentences.push("والإضاءة خافتة");
+      }
+
+      const finalMsg = sentences.join("، ") + ".";
+      speedSensorVal.textContent = `${Math.round(performance.now() - t0)} ms`;
+
+      if (isLiveSilent) {
+        showAnswer("المساعد المباشر", finalMsg, hasDanger, false);
+        if (detected.length > 0 || sensors.motionZone !== "ثابت") {
+          const key = `${detected.map(d => d.cls.id + d.zoneLabel).join("|")}_${sensors.motionZone}`;
+          const now = Date.now();
+          const cooldown = hasDanger ? 2200 : 4000;
+          if (key !== lastLiveKey || now - lastLiveTime > cooldown) {
+            lastLiveKey = key;
+            lastLiveTime = now;
+            speakArabic(finalMsg, hasDanger);
           }
         }
-        for (let c = 0; c < C; c++) {
-          b[c] -= lr * gradB[c];
-          const wc = W[c];
-          const gwc = gradW[c];
-          for (let j = 0; j < D; j++) wc[j] -= lr * (gwc[j] + reg * wc[j]);
-        }
+      } else {
+        showAnswer(parsed.intentLabel, finalMsg, hasDanger);
       }
-
-      linearHead = { activeClasses, W, b };
     }
 
+    describeBtn.addEventListener("click", () => { initAudio(); handleUserQuestion("وصفلي ايه اللي قدامي؟"); });
+    safetyBtn.addEventListener("click", () => { initAudio(); handleUserQuestion("هل الطريق أمان ولا في خطر؟"); });
+    askBtn.addEventListener("click", () => {
+      initAudio();
+      if (questionInput.value.trim()) handleUserQuestion(questionInput.value);
+    });
+    questionInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && questionInput.value.trim()) {
+        initAudio();
+        handleUserQuestion(questionInput.value);
+      }
+    });
+    document.querySelectorAll(".q-chip").forEach(ch => {
+      ch.addEventListener("click", () => {
+        initAudio();
+        questionInput.value = ch.dataset.q;
+        handleUserQuestion(ch.dataset.q);
+      });
+    });
+
+    function stopLiveMode() {
+      isLiveMode = false;
+      if (liveTimer) clearInterval(liveTimer);
+      liveTimer = null;
+      liveBtn.classList.remove("active");
+      liveBtn.textContent = "⚡ تنبيه تلقائي: متوقف";
+    }
+
+    liveBtn.addEventListener("click", () => {
+      initAudio();
+      if (isLiveMode) { stopLiveMode(); return; }
+      if (!getActiveSource()) { alert("شغّل الكاميرا أولاً."); return; }
+      isLiveMode = true;
+      liveBtn.classList.add("active");
+      liveBtn.textContent = "⚡ تنبيه تلقائي: يعمل";
+      liveTimer = setInterval(() => {
+        if (!hasUploadedSource && video.readyState >= 2) handleUserQuestion("وصف المشهد", true);
+      }, 380);
+    });
+
     // =========================================================
-    // 7. إدارة الفئات والواجهة وإدخال الصور/المجلدات
+    // 8. إدارة الفئات والمجلدات
     // =========================================================
     function ensureClass(name) {
       const clean = name.trim();
       if (!clean) return null;
-      let existing = classes.find(c => c.name === clean);
-      if (existing) return existing;
-
-      const newObj = {
+      let ex = classes.find(c => c.name === clean);
+      if (ex) return ex;
+      const obj = {
         id: `cls_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
         name: clean,
-        isDanger: isLikelyDanger(clean)
+        isDanger: isLikelyDanger(clean),
+        isBg: isLikelyBg(clean)
       };
-      classes.push(newObj);
-      return newObj;
+      classes.push(obj);
+      return obj;
     }
 
-    function persistAll() {
-      dbSave({ classes, samples });
-    }
+    function persistAll() { dbSave({ classes, samples }); }
 
     function renderClassesUI() {
-      totalSamplesBadge.textContent = `${samples.length} صورة إجمالاً`;
+      totalSamplesBadge.textContent = `${samples.length} صورة`;
       classesListEl.innerHTML = "";
-
       if (classes.length === 0) {
-        classesListEl.innerHTML = `
-          <div style="text-align:center; color:var(--muted); padding:18px; font-size:0.86rem; background:var(--card-2); border-radius:10px;">
-            لا توجد فئات بعد. اكتب اسم فئة بالأعلى أو اختر مجلد فئات للتدريب التلقائي.
-          </div>
-        `;
+        classesListEl.innerHTML = `<div style="text-align:center; color:var(--muted); padding:14px; font-size:0.84rem; background:var(--card-2); border-radius:10px;">أضف فئاتك مثل (باب، حفرة، نار) + فئة (طريق خالٍ) للتمييز المثالي.</div>`;
         return;
       }
 
       for (const cls of classes) {
         const clsSamples = samples.filter(s => s.classId === cls.id);
         const card = document.createElement("div");
-        card.className = `class-card ${cls.isDanger ? "is-danger" : ""}`;
+        card.className = `class-card ${cls.isDanger ? "is-danger" : (cls.isBg ? "is-bg" : "")}`;
+
+        const badgeClass = cls.isBg ? "badge-bg" : (cls.isDanger ? "badge-danger" : "badge-normal");
+        const badgeText = cls.isBg ? "خلفية / آمن" : (cls.isDanger ? "خطر" : "عادي");
+        const icon = cls.isBg ? "🛣️" : (cls.isDanger ? "⚠️" : "🏷️");
 
         card.innerHTML = `
           <div class="class-header">
             <div class="class-title-wrap">
-              <span>${cls.isDanger ? "⚠️" : "🏷️"} ${cls.name}</span>
-              <span style="font-size:0.78rem; color:var(--muted);">(${clsSamples.length})</span>
-              <span class="badge-type ${cls.isDanger ? "badge-danger" : "badge-normal"}" title="اضغط للتبديل بين عادي وخطر">
-                ${cls.isDanger ? "خطر / تحذير" : "عادي"}
-              </span>
+              <span>${icon} ${cls.name}</span>
+              <span style="font-size:0.76rem; color:var(--muted);">(${clsSamples.length})</span>
+              <span class="badge-type ${badgeClass}" title="اضغط للتبديل: عادي / خطر / خلفية">${badgeText}</span>
             </div>
-            <div class="class-actions">
-              <button class="btn-primary btn-xs cap-btn">📷 التقط</button>
-              <label class="file-label btn-secondary btn-xs">
-                🖼️ صور
-                <input type="file" multiple accept="image/*" class="multi-img-input" />
-              </label>
+            <div style="display:flex; gap:5px;">
+              <button class="btn-primary btn-xs cap-btn">📷 لقطة</button>
+              <label class="file-label btn-secondary btn-xs">🖼️ صور<input type="file" multiple accept="image/*" class="multi-img-input" /></label>
               <button class="btn-danger btn-xs del-cls-btn">🗑️</button>
             </div>
           </div>
           <div class="thumbs-grid"></div>
         `;
 
-        // تبديل نوع الفئة (عادي / خطر)
+        // التبديل بين عادي -> خطر -> خلفية
         card.querySelector(".badge-type").addEventListener("click", () => {
-          cls.isDanger = !cls.isDanger;
+          if (!cls.isDanger && !cls.isBg) { cls.isDanger = true; cls.isBg = false; }
+          else if (cls.isDanger) { cls.isDanger = false; cls.isBg = true; }
+          else { cls.isDanger = false; cls.isBg = false; }
           persistAll();
           renderClassesUI();
         });
 
-        // التقاط من الكاميرا لهذه الفئة
-        card.querySelector(".cap-btn").addEventListener("click", () => captureIntoClass(cls));
+        card.querySelector(".cap-btn").addEventListener("click", () => {
+          const source = getActiveSource();
+          if (!source) { alert("شغّل الكاميرا أو ارفع صورة أولاً."); return; }
+          const { w, h } = captureToWorkCanvas(source);
+          const side = Math.min(w, h);
+          const feat = drawRegionAndExtract(workCanvas, (w - side) / 2, (h - side) / 2, side);
+          samples.push({ id: `smp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`, classId: cls.id, ...feat });
+          retrainLinearHead();
+          persistAll();
+          renderClassesUI();
+          log(`تم تدريب لقطة لـ «${cls.name}».`);
+        });
 
-        // رفع عدة صور لهذه الفئة
         card.querySelector(".multi-img-input").addEventListener("change", async (e) => {
-          const files = Array.from(e.target.files || []).filter(f => /\.(jpe?g|png|webp|bmp|gif)$/i.test(f.name) || f.type.startsWith("image/"));
+          const files = Array.from(e.target.files || []).filter(f => f.type.startsWith("image/") || /\.(jpe?g|png|webp|bmp|gif)$/i.test(f.name));
           e.target.value = "";
           if (files.length > 0) await processImageFilesBatch(files.map(f => ({ file: f, className: cls.name })));
         });
 
-        // حذف الفئة
         card.querySelector(".del-cls-btn").addEventListener("click", () => {
           classes = classes.filter(c => c.id !== cls.id);
           samples = samples.filter(s => s.classId !== cls.id);
           retrainLinearHead();
           persistAll();
           renderClassesUI();
-          log(`تم حذف الفئة «${cls.name}».`);
         });
 
-        // عرض آخر 8 مصغرات فقط للحفاظ على سرعة الصفحة
         const thumbsWrap = card.querySelector(".thumbs-grid");
-        const visible = clsSamples.slice(-8);
-        if (clsSamples.length > 8) {
+        const visible = clsSamples.slice(-6);
+        if (clsSamples.length > 6) {
           const more = document.createElement("div");
           more.className = "more-badge";
-          more.textContent = `+${clsSamples.length - 8} أخرى`;
+          more.textContent = `+${clsSamples.length - 6}`;
           thumbsWrap.appendChild(more);
         }
         for (const s of visible) {
           const t = document.createElement("div");
           t.className = "thumb-item";
-          t.innerHTML = `<img src="${s.thumb}" /><button class="thumb-del" title="حذف">×</button>`;
+          t.innerHTML = `<img src="${s.thumb}" /><button class="thumb-del">×</button>`;
           t.querySelector(".thumb-del").addEventListener("click", () => {
             samples = samples.filter(item => item.id !== s.id);
             retrainLinearHead();
@@ -1151,7 +1487,6 @@
           });
           thumbsWrap.appendChild(t);
         }
-
         classesListEl.appendChild(card);
       }
     }
@@ -1162,59 +1497,16 @@
       newClassInput.value = "";
       persistAll();
       renderClassesUI();
-      log(`تمت إضافة الفئة «${cls.name}».`);
     });
-
-    newClassInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") addClassBtn.click();
-    });
-
-    document.querySelectorAll(".chip").forEach(chip => {
-      chip.addEventListener("click", () => {
-        const cls = ensureClass(chip.dataset.name);
-        if (cls) {
-          persistAll();
-          renderClassesUI();
-        }
+    newClassInput.addEventListener("keydown", (e) => { if (e.key === "Enter") addClassBtn.click(); });
+    document.querySelectorAll(".add-chip").forEach(ch => {
+      ch.addEventListener("click", () => {
+        if (ensureClass(ch.dataset.name)) { persistAll(); renderClassesUI(); }
       });
     });
 
-    async function captureIntoClass(cls) {
-      if (!mobilenetModel) { alert("انتظر جاهزية MobileNet v2."); return; }
-      if (isBusy) return;
-      const source = getActiveVisualSource();
-      if (!source) { alert("شغّل الكاميرا أو ارفع صورة أولاً."); return; }
-
-      isBusy = true;
-      try {
-        const thumb = drawCenterCropTo224(source, true);
-        const vec = await extractEmbedding(cropCanvas);
-        const flipVec = await extractFlippedEmbedding();
-
-        samples.push({
-          id: `smp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-          classId: cls.id,
-          vec,
-          flipVec,
-          thumb
-        });
-
-        retrainLinearHead();
-        persistAll();
-        renderClassesUI();
-        log(`تمت إضافة لقطة جديدة إلى «${cls.name}».`);
-      } finally {
-        isBusy = false;
-      }
-    }
-
-    // =========================================================
-    // 8. استيراد المجلدات والصور دفعة واحدة بدون تجميد المتصفح
-    // =========================================================
     function loadBitmapFromFile(file) {
-      if ("createImageBitmap" in window) {
-        return createImageBitmap(file);
-      }
+      if ("createImageBitmap" in window) return createImageBitmap(file);
       return new Promise((resolve, reject) => {
         const url = URL.createObjectURL(file);
         const img = new Image();
@@ -1225,303 +1517,68 @@
     }
 
     async function processImageFilesBatch(items) {
-      if (!mobilenetModel) {
-        alert("انتظر حتى تكتمل شارة «جاهز للتدريب والتشغيل».");
-        return;
-      }
       stopLiveMode();
       cancelBatchFlag = false;
-      isBusy = true;
-
       progressWrap.style.display = "block";
       cancelImportBtn.style.display = "inline-flex";
 
       let done = 0;
       const total = items.length;
-
       try {
         for (const item of items) {
           if (cancelBatchFlag) break;
           const cls = ensureClass(item.className);
           if (!cls) continue;
-
           try {
             const bmp = await loadBitmapFromFile(item.file);
-            const sw = bmp.width;
-            const sh = bmp.height;
-            const side = Math.min(sw, sh);
-            const sx = (sw - side) / 2;
-            const sy = (sh - side) / 2;
-
-            cropCanvas.getContext("2d").drawImage(bmp, sx, sy, side, side, 0, 0, 224, 224);
-            thumbCanvas.getContext("2d").drawImage(cropCanvas, 0, 0, 48, 48);
-            const thumb = thumbCanvas.toDataURL("image/jpeg", 0.6);
-
+            const side = Math.min(bmp.width, bmp.height);
+            const feat = drawRegionAndExtract(bmp, (bmp.width - side) / 2, (bmp.height - side) / 2, side);
             if (typeof bmp.close === "function") bmp.close();
-
-            const vec = await extractEmbedding(cropCanvas);
-            const flipVec = await extractFlippedEmbedding();
-
-            samples.push({
-              id: `smp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-              classId: cls.id,
-              vec,
-              flipVec,
-              thumb
-            });
-          } catch (err) {
-            console.warn("تم تخطي صورة تالفة:", item.file.name);
-          }
+            samples.push({ id: `smp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`, classId: cls.id, ...feat });
+          } catch (e) {}
 
           done++;
           const pct = Math.round((done / total) * 100);
           progressBar.style.width = `${pct}%`;
-          progressText.textContent = `جاري تدريب: ${done} / ${total} صورة (${cls.name}) — ${pct}%`;
-
-          // إتاحة رسم الواجهة بسلاسة
-          await new Promise(r => setTimeout(r, 0));
+          progressText.textContent = `جاري التدريب المحلي: ${done} / ${total} (${cls.name}) — ${pct}%`;
+          if (done % 4 === 0) await new Promise(r => setTimeout(r, 0));
         }
-
-        progressText.textContent = "جاري موازنة الأوزان النهائية لكل الفئات...";
-        await new Promise(r => setTimeout(r, 10));
 
         retrainLinearHead();
         persistAll();
         renderClassesUI();
-
-        log(`تم تدريب ${done} صورة بنجاح عبر ${classes.length} فئات.`);
-        resultBox.innerHTML = `
-          <div class="prediction-title" style="color:var(--ok);">✓ اكتمل تدريب المجلدات (${done} صورة)</div>
-          <div style="color:var(--muted); font-size:0.86rem;">
-            النموذج جاهز الآن للاختبار أو تشغيل «المساعد المباشر» لفاقدي البصر.
-          </div>
-        `;
+        log(`تم تدريب ${done} صورة محلياً عبر ${classes.length} فئات.`);
       } finally {
-        isBusy = false;
         cancelImportBtn.style.display = "none";
-        setTimeout(() => { progressWrap.style.display = "none"; }, 1800);
+        setTimeout(() => { progressWrap.style.display = "none"; }, 1600);
       }
     }
 
     folderInput.addEventListener("change", async (e) => {
-      const files = Array.from(e.target.files || []).filter(f =>
-        f.type.startsWith("image/") || /\.(jpe?g|png|webp|bmp|gif)$/i.test(f.name)
-      );
+      const files = Array.from(e.target.files || []).filter(f => f.type.startsWith("image/") || /\.(jpe?g|png|webp|bmp|gif)$/i.test(f.name));
       folderInput.value = "";
-      if (files.length === 0) {
-        alert("لم يتم العثور على صور صالحة داخل المجلد المختار.");
-        return;
-      }
-
-      // استخراج اسم الفئة من مسار المجلد: dataset/باب/img.jpg => "باب"
+      if (files.length === 0) return;
       const items = files.map(f => {
         const parts = (f.webkitRelativePath || f.name).split("/").filter(Boolean);
-        let className = "فئة عامة";
-        if (parts.length >= 3) className = parts[1];
-        else if (parts.length === 2) className = parts[0];
+        let className = parts.length >= 3 ? parts[1] : (parts.length === 2 ? parts[0] : "فئة عامة");
         return { file: f, className };
       });
-
       await processImageFilesBatch(items);
     });
+    cancelImportBtn.addEventListener("click", () => { cancelBatchFlag = true; });
 
-    cancelImportBtn.addEventListener("click", () => {
-      cancelBatchFlag = true;
-    });
-
-    // =========================================================
-    // 9. الاختبار والتشغيل المستمر للمكفوفين
-    // =========================================================
-    async function testCurrentFrame(isLive = false) {
-      if (!mobilenetModel || isBusy) return;
-      if (!linearHead || linearHead.activeClasses.length === 0) {
-        if (!isLive) alert("أضف صوراً لفئة واحدة على الأقل قبل الاختبار.");
-        return;
-      }
-
-      const source = getActiveVisualSource();
-      if (!source) {
-        if (!isLive) alert("شغّل الكاميرا أو ارفع صورة للاختبار.");
-        return;
-      }
-
-      isBusy = true;
-      try {
-        drawCenterCropTo224(source, false);
-        const vec = await extractEmbedding(cropCanvas);
-
-        const active = linearHead.activeClasses;
-        const C = active.length;
-
-        // حساب التشابه (Max & Top-3 Mean) مع كل فئة نشطة
-        const maxSims = new Array(C).fill(0);
-        const topKMeans = new Array(C).fill(0);
-
-        for (let c = 0; c < C; c++) {
-          const cid = active[c].id;
-          const sims = [];
-          for (const s of samples) {
-            if (s.classId !== cid) continue;
-            sims.push(dot(vec, s.vec));
-            if (s.flipVec) sims.push(dot(vec, s.flipVec));
-          }
-          sims.sort((a, b) => b - a);
-          maxSims[c] = sims[0] || 0;
-          const k = Math.min(3, sims.length);
-          let sum = 0;
-          for (let i = 0; i < k; i++) sum += sims[i];
-          topKMeans[c] = k > 0 ? sum / k : 0;
-        }
-
-        let probs = new Float64Array(C);
-        if (C === 1) {
-          probs[0] = 1;
-        } else {
-          const linLogits = new Float64Array(C);
-          const pLin = new Float64Array(C);
-          for (let c = 0; c < C; c++) linLogits[c] = linearHead.b[c] + dot(linearHead.W[c], vec);
-          softmaxInto(linLogits, pLin);
-
-          const knnLogits = new Float64Array(C);
-          const pKnn = new Float64Array(C);
-          for (let c = 0; c < C; c++) knnLogits[c] = topKMeans[c] * 18;
-          softmaxInto(knnLogits, pKnn);
-
-          for (let c = 0; c < C; c++) probs[c] = 0.5 * pLin[c] + 0.5 * pKnn[c];
-        }
-
-        // إيجاد أعلى فئة وأعلى تشابه دلالي
-        let winIdx = 0;
-        let bestAnySim = 0;
-        for (let c = 0; c < C; c++) {
-          if (probs[c] > probs[winIdx]) winIdx = c;
-          if (maxSims[c] > bestAnySim) bestAnySim = maxSims[c];
-        }
-
-        const oodThreshold = Number(oodRange.value) / 100;
-        const confThreshold = Number(confRange.value) / 100;
-        const winClass = active[winIdx];
-        const winProb = probs[winIdx];
-        const winPct = Math.round(winProb * 100);
-        const simPct = Math.round(bestAnySim * 100);
-
-        let titleHtml = "";
-        let subText = "";
-
-        if (bestAnySim < oodThreshold) {
-          stableCandidate = "";
-          stableCount = 0;
-          titleHtml = `<div class="prediction-title" style="color:var(--muted);">🟢 طريق خالٍ / جسم غير معروف</div>`;
-          subText = `أعلى تشابه مع الفئات المدرَّبة هو ${simPct}% (أقل من الحد ${oodRange.value}%).`;
-        } else if (C > 1 && winProb < confThreshold) {
-          stableCandidate = "";
-          stableCount = 0;
-          titleHtml = `<div class="prediction-title" style="color:var(--warn);">⚠️ جسم غير مؤكد (الأقرب: ${winClass.name} ${winPct}%)</div>`;
-          subText = `الثقة أقل من الحد المطلوب (${confRange.value}%).`;
-        } else {
-          const color = winClass.isDanger ? "var(--danger)" : "var(--ok)";
-          const icon = winClass.isDanger ? "⚠️ تحذير!" : "✓ أمامك:";
-          titleHtml = `<div class="prediction-title" style="color:${color};">${icon} ${winClass.name} (${winPct}%)</div>`;
-          subText = `نسبة التشابه البصري: ${simPct}%`;
-
-          // منطق النطق الصوتي المستقر
-          if (!isLive) {
-            speakArabic(winClass.isDanger ? `تحذير! أمامك ${winClass.name}` : `أمامك ${winClass.name}`, winClass.isDanger);
-          } else {
-            if (stableCandidate === winClass.id) stableCount++;
-            else {
-              stableCandidate = winClass.id;
-              stableCount = 1;
-            }
-            const now = Date.now();
-            const cooldown = winClass.isDanger ? 2200 : 3500;
-            if (stableCount >= 2 && (lastSpokenClass !== winClass.id || now - lastSpokenTime > cooldown)) {
-              lastSpokenClass = winClass.id;
-              lastSpokenTime = now;
-              speakArabic(winClass.isDanger ? `تحذير! أمامك ${winClass.name}` : `أمامك ${winClass.name}`, winClass.isDanger);
-            }
-          }
-        }
-
-        // عرض أعلى 4 فئات ترتيباً
-        const ranked = active.map((c, i) => ({
-          name: c.name,
-          isDanger: c.isDanger,
-          pct: Math.round(probs[i] * 100)
-        })).sort((a, b) => b.pct - a.pct).slice(0, 4);
-
-        const barsHtml = ranked.map(r => `
-          <div class="prob-row">
-            <span class="prob-name" style="color:${r.isDanger ? "#fca5a5" : "var(--text)"};">${r.isDanger ? "⚠️" : "•"} ${r.name}</span>
-            <div class="meter-wrap"><div class="meter-bar" style="width:${r.pct}%; background:${r.isDanger ? "var(--danger)" : "var(--accent)"};"></div></div>
-            <span>${r.pct}%</span>
-          </div>
-        `).join("");
-
-        resultBox.innerHTML = `${titleHtml}<div style="font-size:0.82rem; color:var(--muted); margin-bottom:8px;">${subText}</div>${barsHtml}`;
-      } finally {
-        isBusy = false;
-      }
-    }
-
-    function stopLiveMode() {
-      isLiveMode = false;
-      if (liveTimer) clearInterval(liveTimer);
-      liveTimer = null;
-      stableCandidate = "";
-      stableCount = 0;
-      liveBtn.classList.remove("active");
-      liveBtn.textContent = "⚡ المساعد المباشر: متوقف";
-    }
-
-    liveBtn.addEventListener("click", () => {
-      initAudio();
-      if (isLiveMode) {
-        stopLiveMode();
-        return;
-      }
-      if (!linearHead || linearHead.activeClasses.length === 0) {
-        alert("درّب فئة واحدة على الأقل أولاً.");
-        return;
-      }
-      if (!getActiveVisualSource()) {
-        alert("شغّل الكاميرا أولاً لتفعيل المساعد المباشر.");
-        return;
-      }
-      isLiveMode = true;
-      liveBtn.classList.add("active");
-      liveBtn.textContent = "⚡ المساعد المباشر: يعمل";
-      liveTimer = setInterval(() => {
-        if (!hasUploadedSource && video.readyState >= 2) testCurrentFrame(true);
-      }, 380);
-    });
-
-    testBtn.addEventListener("click", () => {
-      initAudio();
-      testCurrentFrame(false);
-    });
-
-    // =========================================================
-    // 10. التصدير والاستيراد والإعدادات
-    // =========================================================
     oodRange.addEventListener("input", () => oodVal.textContent = `${oodRange.value}%`);
     confRange.addEventListener("input", () => confVal.textContent = `${confRange.value}%`);
 
     exportBtn.addEventListener("click", () => {
-      if (samples.length === 0) {
-        alert("لا توجد بيانات تدريب لتصديرها.");
-        return;
-      }
-      // تصدير خفيف بدون الصور المصغرة لتقليل الحجم للمشاريع النهائية (أو الاحتفاظ بها عند الرغبة)
-      const lightSamples = samples.map(s => ({ id: s.id, classId: s.classId, vec: s.vec, flipVec: s.flipVec, thumb: s.thumb }));
-      const blob = new Blob([JSON.stringify({ classes, samples: lightSamples })], { type: "application/json" });
+      if (samples.length === 0) { alert("لا توجد فئات مدرَّبة لتصديرها."); return; }
+      const blob = new Blob([JSON.stringify({ engine: "pure-js-hog-hsv-v1", classes, samples })], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "blind-assist-vision-model.json";
+      a.download = "pure-js-blind-assistant.json";
       a.click();
       URL.revokeObjectURL(url);
-      log("تم تصدير النموذج الجاهز (blind-assist-vision-model.json).");
     });
 
     importModelInput.addEventListener("change", (e) => {
@@ -1531,36 +1588,44 @@
       reader.onload = (ev) => {
         try {
           const data = JSON.parse(ev.target.result);
-          if (!Array.isArray(data.classes) || !Array.isArray(data.samples)) {
-            throw new Error("ملف النموذج غير صالح.");
+          if (data.engine !== "pure-js-hog-hsv-v1") {
+            throw new Error("هذا الملف ليس بصيغة المحرك المستقل (pure-js-hog-hsv-v1).");
           }
           classes = data.classes;
           samples = data.samples;
           retrainLinearHead();
           persistAll();
           renderClassesUI();
-          log(`تم استيراد النموذج بنجاح (${classes.length} فئات، ${samples.length} عينة).`);
-        } catch (err) {
-          alert(err.message);
-        }
+          log(`تم استيراد ${classes.length} فئات و ${samples.length} صورة.`);
+        } catch (err) { alert(err.message); }
       };
       reader.readAsText(file);
       importModelInput.value = "";
     });
 
     resetAllBtn.addEventListener("click", async () => {
-      if (!confirm("هل تريد مسح جميع الفئات والصور المدرَّبة؟")) return;
+      if (!confirm("مسح جميع الفئات والصور؟")) return;
       stopLiveMode();
       classes = [];
       samples = [];
       linearHead = null;
       await dbSave({ classes: [], samples: [] });
       renderClassesUI();
-      resultBox.innerHTML = `<div class="prediction-title">تم تصفير جميع الفئات</div>`;
-      log("تم مسح كل البيانات.");
+      clearOverlay();
+      log("تم مسح جميع البيانات.");
     });
 
-    initMobileNet();
+    // تحميل البيانات المحفوظة فوراً عند الفتح
+    (async () => {
+      const saved = await dbLoad();
+      if (saved && Array.isArray(saved.classes)) {
+        classes = saved.classes;
+        samples = saved.samples || [];
+        retrainLinearHead();
+        log(`تمت استعادة ${classes.length} فئات و ${samples.length} صورة محلياً.`);
+      }
+      renderClassesUI();
+    })();
   </script>
 </body>
 </html>
